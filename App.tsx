@@ -166,11 +166,11 @@ const App: React.FC = () => {
                     </div>
                 );
             }
-            return <CompanyDashboard user={user} notify={showToast} onNavigate={setCurrentView} setEditStationId={setEditStationId} initialTab={currentView === 'COMPANY_PROFILE' ? 'profile' : 'dashboard'} />;
+            return <CompanyDashboard user={user} notify={showToast} onNavigate={setCurrentView} setEditStationId={setEditStationId} />;
         }
 
         if (user.role === 'CLIENT') {
-            return <ClientDashboard user={user} notify={showToast} initialTab={currentView === 'CLIENT_PROFILE' ? 'profile' : 'dashboard'} />;
+            return <ClientDashboard user={user} notify={showToast} />;
         }
 
         return <div>Role non reconnu</div>;
