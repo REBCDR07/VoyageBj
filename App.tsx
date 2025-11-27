@@ -98,6 +98,11 @@ const App: React.FC = () => {
         }
     }, []);
 
+    // Scroll to top on every view change
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }, [currentView]);
+
     const handleLogin = (loggedInUser: User) => {
         setUser(loggedInUser);
         setCurrentUser(loggedInUser);

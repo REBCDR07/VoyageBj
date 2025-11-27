@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Truck, Home, Bell, Menu, LayoutDashboard, LogOut, X, ChevronRight, User as UserIcon, Briefcase, Shield } from 'lucide-react';
 import { User } from '../types';
@@ -28,74 +27,134 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
 
     return (
         <>
-            <nav className="af-navbar">
-                <div className="flex items-center">
-                    {/* Hamburger Button - Visible on Mobile (md breakpoint to match links visibility) */}
-                    <button onClick={toggleMenu} className="p-2 mr-2 text-gray-500 hover:text-[#008751] focus:outline-none md:hidden">
-                        <Menu size={24} />
-                    </button>
+            <nav className="fixed top-0 left-0 right-0 z-[1000] bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm transition-all duration-300 supports-[backdrop-filter]:bg-white/60">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16 md:h-20 gap-4">
+                        
+                        {/* Left Section: Menu Toggle + Brand */}
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <button 
+                                onClick={toggleMenu} 
+                                className="p-2.5 -ml-2 text-gray-600 hover:text-[#008751] hover:bg-green-50 rounded-xl focus:outline-none lg:hidden transition-all active:scale-95"
+                                title="Menu Principal"
+                            >
+                                <Menu size={24} strokeWidth={2.5} />
+                            </button>
 
-                    {/* Brand */}
-                    <div
-                        className="flex items-center gap-2 cursor-pointer"
-                        onClick={() => onNavigate('LANDING')}
-                    >
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#008751] to-[#006b40] text-white flex items-center justify-center rounded-lg shadow-lg">
-                            <Truck size={24} />
+                            {/* Brand */}
+                            <div
+                                className="flex items-center gap-3 cursor-pointer group select-none"
+                                onClick={() => {
+                                    onNavigate('LANDING');
+                                    setVisitorMenuOpen(false);
+                                }}
+                            >
+                                <div className="w-10 h-10 bg-gradient-to-br from-[#008751] to-[#006b40] text-white flex items-center justify-center rounded-xl shadow-lg shadow-green-200 group-hover:shadow-green-300 transition-all duration-300 transform group-hover:scale-105">
+                                    <Truck size={20} className="fill-white/20" />
+                                </div>
+                                <div className="hidden sm:block">
+                                    <h1 className="text-2xl font-black text-gray-900 tracking-tighter leading-none group-hover:text-[#008751] transition-colors">
+                                        Voyage<span className="text-[#008751]">Bj</span>
+                                    </h1>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] group-hover:text-gray-600 transition-colors">Transport</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="hidden md:block">
-                            <h1 className="text-2xl font-dancing font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#008751] to-[#e8112d] tracking-tight leading-none">VoyageBj</h1>
-                            <p className="text-[10px] text-[#008751] font-bold uppercase tracking-widest">Bénin Transport</p>
+
+                        {/* Right Section: Actions */}
+                        <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+                            {/* Home Button (Visible on all sizes, refined) */}
+                            <button 
+                                onClick={() => onNavigate('LANDING')} 
+                                className="p-2.5 text-gray-400 hover:text-[#008751] hover:bg-gray-50 rounded-xl transition-all active:scale-95 hidden sm:block"
+                                title="Retour à l'accueil"
+                            >
+                                <Home size={22} />
+                            </button>
+
+                            {user ? (
+                                /* Logged In State */
+                                <>
+                                    {/* Notifications */}
+                                    <div className="relative group cursor-pointer p-2.5 hover:bg-gray-50 rounded-xl transition-all hidden sm:block active:scale-95">
+                                        <div className="relative">
+                                            <Bell size={22} className="text-gray-400 group-hover:text-gray-600 transition-colors" />
+                                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#e8112d] rounded-full text-[10px] text-white flex items-center justify-center border-2 border-white font-bold shadow-sm">3</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Profile Dropdown Trigger */}
+                                    <div className="relative group">
+                                        <button className="flex items-center gap-3 focus:outline-none p-1.5 pl-2 hover:bg-gray-50 rounded-2xl transition-all border border-transparent hover:border-gray-100">
+                                            <div className="text-right hidden md:block">
+                                                <p className="text-sm font-bold text-gray-800 leading-tight truncate max-w-[120px]">{user.companyName || user.name}</p>
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">{user.role === 'ADMIN' ? 'Admin' : (user.role === 'COMPANY' ? 'Partenaire' : 'Voyageur')}</p>
+                                            </div>
+                                            <img 
+                                                src={user.avatarUrl} 
+                                                alt="Profile" 
+                                                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-white shadow-md object-cover bg-gray-100 ring-1 ring-gray-100"
+                                            />
+                                        </button>
+
+                                        {/* Dropdown Menu */}
+                                        <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hidden group-hover:block z-50 animate-fade-in origin-top-right">
+                                            <div className="p-2 space-y-1">
+                                                <button 
+                                                    onClick={() => {
+                                                        onNavigate(user.role === 'COMPANY' ? 'DASHBOARD_COMPANY' : (user.role === 'ADMIN' ? 'DASHBOARD_ADMIN' : 'DASHBOARD_CLIENT'));
+                                                        setVisitorMenuOpen(false);
+                                                    }} 
+                                                    className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-[#008751] font-bold rounded-xl transition-colors flex items-center gap-3"
+                                                >
+                                                    <LayoutDashboard size={18} /> Tableau de bord
+                                                </button>
+                                                <div className="h-px bg-gray-100 my-1 mx-2"></div>
+                                                <button 
+                                                    onClick={onLogout} 
+                                                    className="w-full text-left px-4 py-3 text-sm text-[#e8112d] hover:bg-red-50 font-bold rounded-xl transition-colors flex items-center gap-3"
+                                                >
+                                                    <LogOut size={18} /> Se déconnecter
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                /* Visitor State (Desktop) */
+                                <div className="hidden lg:flex items-center gap-2 bg-gray-50/50 p-1.5 rounded-full border border-gray-100">
+                                    <button 
+                                        onClick={() => onNavigate('LOGIN_VOYAGEUR')} 
+                                        className="text-sm font-bold text-gray-600 hover:text-[#008751] transition-colors px-4 py-2 rounded-full hover:bg-white"
+                                    >
+                                        Je voyage
+                                    </button>
+                                    <div className="w-px h-4 bg-gray-300"></div>
+                                    <button 
+                                        onClick={() => onNavigate('LOGIN_COMPANY')} 
+                                        className="text-sm font-bold text-gray-600 hover:text-[#008751] transition-colors px-4 py-2 rounded-full hover:bg-white"
+                                    >
+                                        Partenaires
+                                    </button>
+                                    
+                                    <button 
+                                        onClick={() => onNavigate('LOGIN_ADMIN')} 
+                                        className="ml-2 text-xs font-bold text-gray-400 hover:text-gray-800 px-3 py-2 transition-colors border border-transparent hover:border-gray-200 rounded-full"
+                                        title="Accès Administration"
+                                    >
+                                        Admin
+                                    </button>
+
+                                    <button 
+                                        onClick={() => onNavigate('LOGIN_VOYAGEUR')} 
+                                        className="ml-2 bg-[#008751] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-green-200 hover:bg-[#006b40] hover:shadow-green-300 transition-all transform active:scale-95"
+                                    >
+                                        Connexion
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
-                </div>
-
-                {/* Right Links (Desktop) */}
-                <div className="flex items-center gap-4">
-                    <button onClick={() => onNavigate('LANDING')} className="text-gray-400 hover:text-[#008751] transition-colors p-2" title="Accueil">
-                        <Home size={20} />
-                    </button>
-
-                    {user ? (
-                        /* User Logged In */
-                        <>
-                            <div className="relative group cursor-pointer p-2">
-                                <div className="relative">
-                                    <Bell size={20} className="text-gray-400 group-hover:text-gray-600" />
-                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#e8112d] rounded-full text-[10px] text-white flex items-center justify-center border-2 border-white">3</span>
-                                </div>
-                            </div>
-
-                            <div className="relative group ml-2">
-                                <button className="flex items-center gap-3 focus:outline-none">
-                                    <div className="text-right hidden sm:block">
-                                        <p className="text-sm font-bold text-gray-800 leading-tight">{user.companyName || user.name}</p>
-                                        <p className="text-xs text-gray-500">{user.role === 'ADMIN' ? 'Administrateur' : (user.role === 'COMPANY' ? 'Partenaire' : 'Voyageur')}</p>
-                                    </div>
-                                    <img src={user.avatarUrl} alt="Profile" className="w-10 h-10 rounded-full border-2 border-[#e9b400] shadow-sm object-cover bg-gray-100" />
-                                </button>
-
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden hidden group-hover:block z-50 animate-fade-in">
-                                    <div className="py-1">
-                                        <button onClick={() => onNavigate(user.role === 'COMPANY' ? 'DASHBOARD_COMPANY' : (user.role === 'ADMIN' ? 'DASHBOARD_ADMIN' : 'DASHBOARD_CLIENT'))} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#008751] font-medium">
-                                            <div className="flex items-center gap-2"><LayoutDashboard size={16} /> Tableau de bord</div>
-                                        </button>
-                                        <button onClick={onLogout} className="block w-full text-left px-4 py-2 text-sm text-[#e8112d] hover:bg-red-50 font-medium border-t border-gray-50">
-                                            <div className="flex items-center gap-2"><LogOut size={16} /> Se déconnecter</div>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        /* Visitor (Desktop) */
-                        <div className="flex items-center gap-3">
-                            <button onClick={() => onNavigate('LOGIN_VOYAGEUR')} className="hidden md:flex text-sm font-bold text-gray-500 hover:text-[#008751]">Je voyage</button>
-                            <button onClick={() => onNavigate('LOGIN_COMPANY')} className="hidden md:flex text-sm font-bold text-gray-500 hover:text-[#008751]">Je suis une compagnie</button>
-                            <button onClick={() => onNavigate('LOGIN_ADMIN')} className="hidden md:flex text-sm font-bold text-gray-400 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-all" title="Accès Administration">Admin</button>
-                            <button onClick={() => onNavigate('LOGIN_VOYAGEUR')} className="bg-[#008751] text-white px-5 py-2 rounded-full font-bold text-sm shadow-md hover:bg-[#006b40] hover:shadow-lg transition-all hidden md:block">Connexion</button>
-                        </div>
-                    )}
                 </div>
             </nav>
 
@@ -104,71 +163,101 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                 <>
                     {/* Backdrop */}
                     <div
-                        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] transition-opacity duration-300 md:hidden ${visitorMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                        className={`fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[9998] transition-opacity duration-500 lg:hidden ${visitorMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                         onClick={() => setVisitorMenuOpen(false)}
                     />
 
                     {/* Sliding Panel */}
-                    <div className={`fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-white z-[9999] shadow-2xl transform transition-transform duration-300 md:hidden ${visitorMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                        <div className="p-6 h-full flex flex-col">
-                            <div className="flex justify-between items-center mb-10">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-[#008751] to-[#006b40] text-white flex items-center justify-center rounded-lg shadow-lg">
-                                        <Truck size={24} />
+                    <div className={`fixed top-0 left-0 bottom-0 w-[85%] sm:w-[380px] bg-white z-[9999] shadow-2xl transform transition-transform duration-500 cubic-bezier(0.32, 0.72, 0, 1) lg:hidden ${visitorMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                        <div className="flex flex-col h-full">
+                            {/* Drawer Header */}
+                            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-[#008751] text-white flex items-center justify-center rounded-xl shadow-md">
+                                        <Truck size={20} />
                                     </div>
-                                    <span className="font-extrabold text-2xl text-gray-800">VoyageBj</span>
+                                    <span className="font-black text-xl text-gray-900 tracking-tight">VoyageBj</span>
                                 </div>
-                                <button onClick={() => setVisitorMenuOpen(false)} className="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors">
-                                    <X size={24} />
+                                <button 
+                                    onClick={() => setVisitorMenuOpen(false)} 
+                                    className="p-2.5 bg-white border border-gray-200 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all active:scale-95"
+                                >
+                                    <X size={20} />
                                 </button>
                             </div>
 
-                            <div className="space-y-3 flex-1">
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Espace Membre</p>
+                            {/* Drawer Items */}
+                            <div className="p-6 space-y-3 flex-1 overflow-y-auto">
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Espace Membre</p>
 
-                                <button onClick={() => handleNav('LOGIN_VOYAGEUR')} className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-green-50 rounded-xl group transition-colors border border-transparent hover:border-green-200">
-                                    <div className="flex items-center gap-3">
-                                        <div className="bg-white p-2 rounded-lg shadow-sm text-gray-600 group-hover:text-[#008751]"><UserIcon size={20} /></div>
+                                <button 
+                                    onClick={() => handleNav('LOGIN_VOYAGEUR')} 
+                                    className="w-full flex items-center justify-between p-4 bg-white border border-gray-100 hover:border-green-200 hover:bg-green-50 rounded-2xl group transition-all shadow-sm hover:shadow-md active:scale-98"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-[#008751] group-hover:scale-110 transition-transform">
+                                            <UserIcon size={20} />
+                                        </div>
                                         <div className="text-left">
-                                            <p className="font-bold text-gray-800">Je voyage</p>
-                                            <p className="text-xs text-gray-500">Connexion Client</p>
+                                            <p className="font-bold text-base text-gray-900">Je voyage</p>
+                                            <p className="text-xs font-medium text-gray-500">Connexion Client</p>
                                         </div>
                                     </div>
-                                    <ChevronRight size={18} className="text-gray-400 group-hover:text-[#008751]" />
+                                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-white group-hover:text-[#008751] transition-colors">
+                                        <ChevronRight size={18} />
+                                    </div>
                                 </button>
 
-                                <button onClick={() => handleNav('LOGIN_COMPANY')} className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-yellow-50 rounded-xl group transition-colors border border-transparent hover:border-yellow-200">
-                                    <div className="flex items-center gap-3">
-                                        <div className="bg-white p-2 rounded-lg shadow-sm text-gray-600 group-hover:text-[#e9b400]"><Briefcase size={20} /></div>
+                                <button 
+                                    onClick={() => handleNav('LOGIN_COMPANY')} 
+                                    className="w-full flex items-center justify-between p-4 bg-white border border-gray-100 hover:border-yellow-200 hover:bg-yellow-50 rounded-2xl group transition-all shadow-sm hover:shadow-md active:scale-98"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-[#e9b400] group-hover:scale-110 transition-transform">
+                                            <Briefcase size={20} />
+                                        </div>
                                         <div className="text-left">
-                                            <p className="font-bold text-gray-800">Je suis une compagnie</p>
-                                            <p className="text-xs text-gray-500">Espace Pro</p>
+                                            <p className="font-bold text-base text-gray-900">Partenaire</p>
+                                            <p className="text-xs font-medium text-gray-500">Espace Compagnie</p>
                                         </div>
                                     </div>
-                                    <ChevronRight size={18} className="text-gray-400 group-hover:text-[#e9b400]" />
+                                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-white group-hover:text-[#e9b400] transition-colors">
+                                        <ChevronRight size={18} />
+                                    </div>
                                 </button>
 
-                                <button onClick={() => handleNav('LOGIN_ADMIN')} className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl group transition-colors border border-transparent hover:border-gray-300">
-                                    <div className="flex items-center gap-3">
-                                        <div className="bg-white p-2 rounded-lg shadow-sm text-gray-600 group-hover:text-gray-900"><Shield size={20} /></div>
+                                <button 
+                                    onClick={() => handleNav('LOGIN_ADMIN')} 
+                                    className="w-full flex items-center justify-between p-4 bg-white border border-gray-100 hover:border-gray-300 hover:bg-gray-50 rounded-2xl group transition-all shadow-sm hover:shadow-md active:scale-98"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 group-hover:scale-110 transition-transform">
+                                            <Shield size={20} />
+                                        </div>
                                         <div className="text-left">
-                                            <p className="font-bold text-gray-800">Administration</p>
-                                            <p className="text-xs text-gray-500">Accès restreint</p>
+                                            <p className="font-bold text-base text-gray-900">Administration</p>
+                                            <p className="text-xs font-medium text-gray-500">Accès restreint</p>
                                         </div>
                                     </div>
-                                    <ChevronRight size={18} className="text-gray-400 group-hover:text-gray-900" />
+                                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-white group-hover:text-gray-900 transition-colors">
+                                        <ChevronRight size={18} />
+                                    </div>
                                 </button>
                             </div>
 
-                            <div className="pt-6 border-t border-gray-100">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="h-10 w-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold text-xs border border-green-200">BJ</div>
+                            {/* Drawer Footer */}
+                            <div className="p-6 bg-gray-50 border-t border-gray-200 mt-auto">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="w-12 h-12 rounded-2xl bg-[#008751]/10 text-[#008751] flex items-center justify-center font-black text-sm border border-[#008751]/20">BJ</div>
                                     <div>
-                                        <p className="text-xs text-gray-500">Support Client</p>
-                                        <p className="font-bold text-sm text-gray-800">+229 97 00 00 00</p>
+                                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Support Client</p>
+                                        <p className="font-black text-lg text-gray-900 tracking-tight">+229 97 00 00 00</p>
                                     </div>
                                 </div>
-                                <button onClick={() => handleNav('SIGNUP_VOYAGEUR')} className="w-full py-4 rounded-xl bg-gradient-to-r from-[#008751] to-[#e9b400] text-white font-bold shadow-lg shadow-green-200 hover:shadow-xl transition-shadow">
+                                <button 
+                                    onClick={() => handleNav('SIGNUP_VOYAGEUR')} 
+                                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#008751] to-[#006b40] text-white font-bold text-base shadow-lg shadow-green-200 hover:shadow-green-300 active:scale-95 transition-all"
+                                >
                                     Créer un compte
                                 </button>
                             </div>

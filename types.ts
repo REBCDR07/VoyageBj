@@ -9,6 +9,7 @@ export type ViewState = 'LANDING' | 'LOGIN_VOYAGEUR' | 'SIGNUP_VOYAGEUR' | 'LOGI
 export type CompanyStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface User {
+  description: string;
   id: string;
   name: string; // Manager name for company, Full name for client
   email: string;
