@@ -57,7 +57,8 @@ const seedData = () => {
         id: 'admin',
         name: 'Administrateur',
         email: 'admin@voyagebj.com',
-        role: UserRole.ADMIN
+        role: UserRole.ADMIN,
+        description: ''
       },
       // Approved Company
       {
@@ -73,7 +74,8 @@ const seedData = () => {
         ifu: '1234567890123',
         rccm: 'RB/COT/001',
         anattUrl: 'autorisation_anatt.pdf',
-        phone: '97000001'
+        phone: '97000001',
+        description: ''
       },
       // Pending Company
       {
@@ -89,7 +91,8 @@ const seedData = () => {
         ifu: '9876543210987',
         rccm: 'RB/COT/002',
         anattUrl: 'demande_agrement.docx',
-        phone: '66000002'
+        phone: '66000002',
+        description: ''
       },
       // Client
       {
@@ -99,7 +102,8 @@ const seedData = () => {
         email: 'amina@mail.com',
         phone: '+229 97000000',
         role: UserRole.CLIENT,
-        avatarUrl: 'https://picsum.photos/id/2/200/200'
+        avatarUrl: 'https://picsum.photos/id/2/200/200',
+        description: ''
       }
     ];
     safeSave(STORAGE_KEYS.USERS, users);
