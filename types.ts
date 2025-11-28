@@ -76,7 +76,7 @@ export interface Reservation {
   pricePaid: number;
   ticketClass: 'STANDARD' | 'PREMIUM';
 
-  status: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  status: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'PENDING';
   createdAt: string;
 }
 
