@@ -1,156 +1,112 @@
-# 🚌 VoyageBj - Plateforme de Réservation de Transport Interurbain
+# 🚌 VoyageBj - Plateforme de Réservation de Transport au Bénin
 
 <div align="center">
 
-![VoyageBj Logo](https://img.shields.io/badge/VoyageBj-Transport%20Digital-008751?style=for-the-badge&logo=bus&logoColor=white)
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![React](https://img.shields.io/badge/React-19.0.0-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-3178C6?logo=typescript)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-4.0.0-38B2AC?logo=tailwind-css)
+![License](https://img.shields.io/badge/license-Private-red.svg)
 
-[![React](https://img.shields.io/badge/React-19.0.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-6.1.0-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.0.0-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+**Plateforme moderne de gestion et de réservation de voyages pour les compagnies de transport béninoises**
 
-**Digitalisez le transport terrestre au Bénin 🇧🇯**
-
-[Démo](#) • [Documentation](#fonctionnalités) • [Installation](#installation)
+[Fonctionnalités](#-fonctionnalités) • [Installation](#-installation) • [Architecture](#-architecture) • [Documentation](#-documentation-technique)
 
 </div>
 
 ---
 
-## 📖 Table des Matières
+## 📋 Table des Matières
 
-- [À Propos](#-à-propos)
+- [Vue d'ensemble](#-vue-densemble)
 - [Fonctionnalités](#-fonctionnalités)
-- [Stack Technologique](#-stack-technologique)
-- [Architecture](#-architecture)
+- [Technologies](#-technologies)
 - [Installation](#-installation)
-- [Utilisation](#-utilisation)
-- [Structure du Projet](#-structure-du-projet)
+- [Architecture](#-architecture)
+- [Documentation Technique](#-documentation-technique)
+- [Workflow](#-workflow)
 - [Contribution](#-contribution)
-- [Licence](#-licence)
 
 ---
 
-## 🎯 À Propos
+## 🎯 Vue d'ensemble
 
-**VoyageBj** est une plateforme web moderne de réservation de billets de transport interurbain au Bénin. Elle connecte les voyageurs aux compagnies de transport agréées, offrant une expérience de réservation fluide, sécurisée et entièrement digitalisée.
+**VoyageBj** est une plateforme web complète qui digitalise le secteur du transport interurbain au Bénin. Elle connecte les compagnies de transport, les voyageurs et les administrateurs dans un écosystème intégré avec gestion des réservations, génération de tickets, et suivi en temps réel.
 
-### 🌟 Vision
+### 🎨 Design System
 
-Transformer le secteur du transport terrestre béninois en digitalisant les processus de réservation, en améliorant la transparence et en optimisant l'expérience utilisateur pour les voyageurs et les compagnies.
-
-### 🎯 Objectifs
-
-- ✅ Faciliter la réservation de billets en ligne 24h/24
-- ✅ Offrir une plateforme de gestion complète pour les compagnies
-- ✅ Garantir la sécurité des transactions et des données
-- ✅ Améliorer la visibilité des compagnies de transport
-- ✅ Réduire les files d'attente dans les gares routières
+Le projet utilise les couleurs du drapeau béninois comme palette principale:
+- **Vert** (`#008751`) - Actions principales, succès
+- **Jaune** (`#FCD116`) - Premium, alertes importantes
+- **Rouge** (`#E8112D`) - Erreurs, actions critiques
 
 ---
 
 ## ✨ Fonctionnalités
 
-### 👤 Pour les Voyageurs
+### 👥 Pour les Voyageurs (Clients)
 
-- 🔍 **Recherche Intelligente** : Trouvez des trajets par ville de départ/arrivée et date
-- 🎫 **Réservation en Ligne** : Réservez et payez vos billets instantanément
-- 📱 **E-Billets avec QR Code** : Téléchargez vos billets en PDF/PNG avec QR code sécurisé
-- 💎 **Classes de Voyage** : Choisissez entre Standard et Premium
-- 📊 **Tableau de Bord Personnel** : Suivez vos réservations et gérez votre profil
-- 🔔 **Notifications en Temps Réel** : Recevez des confirmations et alertes
-- 📅 **Validation des Jours** : Vérification automatique des jours de départ disponibles
+- ✅ **Recherche et réservation** de trajets en temps réel
+- ✅ **Deux types de billets**: Standard et Premium
+- ✅ **Génération de tickets** avec QR Code (PDF et PNG)
+- ✅ **Historique des voyages** avec statuts en temps réel
+- ✅ **Profil personnalisable** avec photo
+- ✅ **Filtrage avancé** par date, compagnie, et destination
 
 ### 🏢 Pour les Compagnies
 
-- 📈 **Dashboard Analytique** : Statistiques de réservations et revenus en temps réel
-- 🚏 **Gestion des Stations** : Créez et gérez vos sous-stations et routes directes
-- 💰 **Tarification Flexible** : Définissez des prix Standard et Premium personnalisés
-- 📋 **Liste des Réservations** : Visualisez et exportez vos réservations (CSV/PDF)
-- 🖼️ **Profil Personnalisable** : Logo, bannière et informations de l'agence
-- 🤖 **Génération de Descriptions IA** : Descriptions automatiques pour vos trajets
-- 📸 **Upload d'Images** : Compression automatique jusqu'à 5MB
+- ✅ **Tableau de bord analytique** avec graphiques (Recharts)
+- ✅ **Gestion des sous-stations** et parcours directs
+- ✅ **Gestion des réservations** avec export PDF/JSON
+- ✅ **Marquage des paiements** (workflow Arrivé → Payé)
+- ✅ **Profil entreprise** avec bannière et logo
+- ✅ **Statistiques de trafic** par station
 
 ### 👨‍💼 Pour les Administrateurs
 
-- ✅ **Validation des Compagnies** : Vérification des documents ANaTT
-- 👁️ **Visualisation de Documents** : Lecteur PDF intégré pour les documents
-- 📊 **Vue d'Ensemble** : Statistiques globales de la plateforme
-- 🔐 **Gestion des Utilisateurs** : Approbation/rejet des inscriptions
+- ✅ **Validation des compagnies** (système d'approbation)
+- ✅ **Vérification des documents** (IFU, RCCM, ANATT)
+- ✅ **Gestion des utilisateurs** (tous rôles)
+- ✅ **Vue d'ensemble du système** avec métriques
+- ✅ **Contact direct** avec les compagnies
 
 ---
 
-## 🛠️ Stack Technologique
+## 🛠 Technologies
 
-### Frontend
+### Frontend Core
 
-<div align="center">
-
-| Technologie | Version | Utilisation |
-|------------|---------|-------------|
-| ![React](https://img.shields.io/badge/-React-61DAFB?style=flat-square&logo=react&logoColor=black) | 19.0.0 | Framework UI principal |
-| ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) | 5.7.2 | Typage statique |
-| ![Vite](https://img.shields.io/badge/-Vite-646CFF?style=flat-square&logo=vite&logoColor=white) | 6.1.0 | Build tool & dev server |
-| ![TailwindCSS](https://img.shields.io/badge/-TailwindCSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) | 4.0.0 | Styling & design system |
-| ![Lucide](https://img.shields.io/badge/-Lucide-000000?style=flat-square&logo=lucide&logoColor=white) | 0.475.0 | Icônes |
-
-</div>
-
-### Bibliothèques Clés
-
-- **react-qr-code** (2.0.18) : Génération de QR codes pour les billets
-- **html-to-image** (1.11.13) : Export de billets en PNG
-- **jspdf** (3.0.4) : Génération de PDF pour les billets
-- **recharts** (2.15.0) : Graphiques et visualisations de données
-
-### Outils de Développement
-
-- **ESLint** : Linting et qualité du code
-- **TypeScript Compiler** : Compilation et vérification de types
-- **Vite Plugin React** : Support React avec Fast Refresh
-
----
-
-## 🏗️ Architecture
-
-### Structure de l'Application
-
-```
-VoyageBj/
-├── 🎨 Frontend (React + TypeScript)
-│   ├── Components (Réutilisables)
-│   ├── Pages (Vues principales)
-│   ├── Services (Logique métier)
-│   └── Utils (Fonctions utilitaires)
-│
-├── 💾 Stockage (LocalStorage)
-│   ├── Users (Voyageurs, Compagnies, Admins)
-│   ├── Stations (Routes et sous-stations)
-│   └── Reservations (Billets)
-│
-└── 🎨 Design System
-    ├── Couleurs du Bénin (Vert, Jaune, Rouge)
-    ├── Typographie (Dancing Script, Inter)
-    └── Composants UI personnalisés
+```json
+{
+  "react": "^19.0.0",
+  "typescript": "~5.7.2",
+  "vite": "^6.1.0",
+  "tailwindcss": "^4.0.0"
+}
 ```
 
-### Flux de Données
+### Bibliothèques UI/UX
 
-```mermaid
-graph LR
-    A[Utilisateur] --> B[Interface React]
-    B --> C[Services]
-    C --> D[LocalStorage]
-    D --> C
-    C --> B
-    B --> A
-```
+| Bibliothèque | Version | Usage |
+|-------------|---------|-------|
+| `lucide-react` | ^0.475.0 | Icônes modernes et cohérentes |
+| `recharts` | ^2.15.0 | Graphiques et analytics |
+| `react-qr-code` | ^2.0.18 | Génération de QR codes pour tickets |
 
-### Rôles Utilisateurs
+### Génération de Documents
 
-1. **VOYAGEUR** : Recherche et réserve des trajets
-2. **COMPANY** : Gère les stations et visualise les réservations
-3. **ADMIN** : Valide les compagnies et supervise la plateforme
+| Bibliothèque | Version | Usage |
+|-------------|---------|-------|
+| `jspdf` | ^3.0.4 | Export PDF des tickets et listes |
+| `html2canvas` | ^1.4.1 | Capture d'écran pour tickets |
+| `html-to-image` | ^1.11.13 | Conversion HTML vers image |
+
+### Build & Dev Tools
+
+- **Vite** - Build tool ultra-rapide avec HMR
+- **TypeScript** - Typage statique pour la robustesse
+- **Tailwind CSS v4** - Styling moderne avec @tailwindcss/vite
+- **ESLint** - Linting et qualité du code
 
 ---
 
@@ -159,276 +115,447 @@ graph LR
 ### Prérequis
 
 - **Node.js** >= 18.0.0
-- **npm** >= 9.0.0 ou **yarn** >= 1.22.0
+- **npm** >= 9.0.0
 
-### Étapes d'Installation
+### Étapes d'installation
 
-1. **Cloner le dépôt**
 ```bash
-git clone https://github.com/votre-username/voyagebj.git
-cd voyagebj
-```
+# 1. Cloner le repository
+git clone <repository-url>
+cd VoyageBj
 
-2. **Installer les dépendances**
-```bash
+# 2. Installer les dépendances
 npm install
-# ou
-yarn install
-```
 
-3. **Lancer le serveur de développement**
-```bash
+# 3. Lancer le serveur de développement
 npm run dev
-# ou
-yarn dev
+
+# 4. Ouvrir dans le navigateur
+# L'application sera disponible sur http://localhost:5173
 ```
 
-4. **Ouvrir dans le navigateur**
-```
-http://localhost:5173
-```
-
-### Build de Production
+### Scripts disponibles
 
 ```bash
-npm run build
-# ou
-yarn build
-```
-
-Les fichiers optimisés seront générés dans le dossier `dist/`.
-
-### Prévisualisation du Build
-
-```bash
-npm run preview
-# ou
-yarn preview
+npm run dev      # Démarre le serveur de développement
+npm run build    # Build de production (TypeScript + Vite)
+npm run preview  # Prévisualise le build de production
+npm run lint     # Vérifie la qualité du code
 ```
 
 ---
 
-## 📘 Utilisation
+## 🏗 Architecture
 
-### Compte Admin par Défaut
+### Structure du Projet
 
 ```
-Email: admin@voyagebj.com
-Mot de passe: admin123
+VoyageBj/
+├── components/          # Composants réutilisables
+│   ├── Navbar.tsx      # Navigation principale
+│   ├── BottomNav.tsx   # Navigation mobile
+│   ├── Ticket.tsx      # Composant de ticket avec QR code
+│   ├── Sidebar.tsx     # Barre latérale admin
+│   ├── Footer.tsx      # Pied de page
+│   └── ...
+├── pages/              # Pages de l'application
+│   ├── auth/          # Pages d'authentification
+│   │   ├── LoginVoyageur.tsx
+│   │   ├── SignupVoyageur.tsx
+│   │   ├── LoginCompany.tsx
+│   │   ├── SignupCompany.tsx
+│   │   └── LoginAdmin.tsx
+│   ├── dashboards/    # Tableaux de bord
+│   │   ├── ClientDashboard.tsx
+│   │   ├── CompanyDashboard.tsx
+│   │   └── AdminDashboard.tsx
+│   ├── company/       # Pages spécifiques compagnies
+│   │   └── StationManager.tsx
+│   ├── LandingPage.tsx
+│   ├── CompaniesPage.tsx
+│   └── SearchResultsPage.tsx
+├── services/          # Services et logique métier
+│   ├── storage.ts    # Gestion localStorage (CRUD)
+│   └── description.tsx
+├── utils/            # Utilitaires
+│   └── imageUtils.ts
+├── types.ts          # Définitions TypeScript
+├── App.tsx           # Composant racine
+├── index.tsx         # Point d'entrée
+└── index.css         # Styles globaux
 ```
 
-### Inscription Voyageur
+### Modèle de Données
 
-1. Cliquez sur "Je voyage" sur la page d'accueil
-2. Remplissez le formulaire d'inscription
-3. Connectez-vous avec vos identifiants
+#### User
+```typescript
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'ADMIN' | 'COMPANY' | 'CLIENT';
+  avatarUrl?: string;
+  
+  // Spécifique Client
+  phone?: string;
+  npi?: string;
+  
+  // Spécifique Compagnie
+  companyName?: string;
+  bannerUrl?: string;
+  ifu?: string;           // Identifiant Fiscal Unique
+  rccm?: string;          // Registre du Commerce
+  anattUrl?: string;      // Document ANATT
+  status?: 'PENDING' | 'APPROVED' | 'REJECTED';
+}
+```
 
-### Inscription Compagnie
+#### Station
+```typescript
+interface Station {
+  id: string;
+  companyId: string;
+  type: 'STATION' | 'ROUTE';  // Sous-station ou parcours direct
+  name: string;
+  photoUrl: string;
+  location: string;
+  
+  // Trajet
+  pointA: string;
+  pointB: string;
+  departurePoint: string;
+  
+  // Horaires
+  workDays: string[];         // ["Lun", "Mar", ...]
+  departureHours: string[];   // ["08:00", "14:00"]
+  arrivalHours?: string[];
+  
+  // Tarification
+  price: number;
+  pricePremium?: number;
+}
+```
 
-1. Cliquez sur "Je suis une Compagnie"
-2. Remplissez les informations de l'agence
-3. Uploadez les documents ANaTT (max 5MB, compression automatique)
-4. Attendez la validation par un administrateur
-
-### Réserver un Trajet
-
-1. Connectez-vous en tant que voyageur
-2. Utilisez le widget de recherche (Départ, Arrivée, Date)
-3. Sélectionnez une compagnie et un trajet
-4. Choisissez votre classe (Standard/Premium)
-5. Remplissez vos informations et validez
-6. Téléchargez votre e-billet avec QR code
-
-### Créer une Station (Compagnie)
-
-1. Connectez-vous en tant que compagnie
-2. Accédez à "Gérer Stations"
-3. Cliquez sur "Nouvelle Station"
-4. Remplissez les informations :
-   - Type (Station/Route directe)
-   - Points A et B
-   - Jours de travail
-   - Heures de départ/arrivée
-   - Prix Standard et Premium
-5. Générez une description automatique (optionnel)
-6. Sauvegardez
+#### Reservation
+```typescript
+interface Reservation {
+  id: string;
+  stationId: string;
+  companyId: string;
+  clientId: string;
+  
+  // Détails passager
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  
+  // Détails voyage
+  routeSummary: string;
+  departureTime: string;
+  departureDate: string;
+  pricePaid: number;
+  ticketClass: 'STANDARD' | 'PREMIUM';
+  
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+  createdAt: string;
+}
+```
 
 ---
 
-## 📂 Structure du Projet
-
-```
-voyagebj/
-│
-├── 📁 public/                  # Fichiers statiques
-│   └── vite.svg
-│
-├── 📁 src/
-│   ├── 📁 components/          # Composants React réutilisables
-│   │   ├── Footer.tsx
-│   │   ├── Hero.tsx
-│   │   ├── Navbar.tsx
-│   │   ├── NotificationSystem.tsx
-│   │   ├── SplashScreen.tsx
-│   │   └── Ticket.tsx
-│   │
-│   ├── 📁 pages/               # Pages principales
-│   │   ├── 📁 auth/            # Authentification
-│   │   │   ├── LoginAdmin.tsx
-│   │   │   ├── LoginCompany.tsx
-│   │   │   ├── LoginVoyageur.tsx
-│   │   │   ├── SignupCompany.tsx
-│   │   │   └── SignupVoyageur.tsx
-│   │   │
-│   │   ├── 📁 dashboards/      # Tableaux de bord
-│   │   │   ├── AdminDashboard.tsx
-│   │   │   ├── ClientDashboard.tsx
-│   │   │   └── CompanyDashboard.tsx
-│   │   │
-│   │   ├── 📁 company/         # Gestion compagnie
-│   │   │   └── StationManager.tsx
-│   │   │
-│   │   ├── CompaniesPage.tsx   # Liste publique des compagnies
-│   │   ├── LandingPage.tsx     # Page d'accueil
-│   │   └── SearchResultsPage.tsx
-│   │
-│   ├── 📁 services/            # Logique métier
-│   │   ├── description.tsx     # Génération de descriptions
-│   │   └── storage.ts          # Gestion LocalStorage
-│   │
-│   ├── 📁 utils/               # Utilitaires
-│   │   └── imageUtils.ts       # Compression d'images
-│   │
-│   ├── App.tsx                 # Composant racine
-│   ├── index.css               # Styles globaux
-│   ├── main.tsx                # Point d'entrée
-│   └── types.ts                # Définitions TypeScript
-│
-├── 📄 index.html               # Template HTML
-├── 📄 package.json             # Dépendances
-├── 📄 tailwind.config.ts       # Configuration Tailwind
-├── 📄 tsconfig.json            # Configuration TypeScript
-├── 📄 vite.config.ts           # Configuration Vite
-└── 📄 README.md                # Ce fichier
-```
-
----
-
-## 🎨 Design System
-
-### Palette de Couleurs (Bénin)
-
-```css
---benin-green: #008751   /* Vert */
---benin-yellow: #FCD116  /* Jaune */
---benin-red: #E8112D     /* Rouge */
-```
-
-### Typographie
-
-- **Titres** : Dancing Script (cursive, élégante)
-- **Corps** : Inter (sans-serif, moderne)
-
-### Composants Clés
-
-- **Benin Gradient** : Dégradé vert → jaune → rouge
-- **Glassmorphism** : Effets de verre pour les modales
-- **Animations** : Transitions fluides et micro-interactions
-
----
-
-## 🔧 Fonctionnement Technique
+## 📚 Documentation Technique
 
 ### Gestion de l'État
 
-L'application utilise **React Hooks** (`useState`, `useEffect`) pour la gestion d'état locale. Les données sont persistées dans **LocalStorage** via le service `storage.ts`.
+L'application utilise **React Hooks** pour la gestion d'état locale:
+- `useState` - État des composants
+- `useEffect` - Effets de bord et synchronisation
+- `useRef` - Références DOM pour génération de tickets
 
-### Stockage des Données
+### Persistance des Données
 
-```typescript
-// Structure LocalStorage
-{
-  "voyagebj_users": User[],
-  "voyagebj_stations": Station[],
-  "voyagebj_reservations": Reservation[]
-}
-```
-
-### Compression d'Images
-
-Les images uploadées sont automatiquement compressées :
-- **Limite** : 5MB
-- **Cible** : 700KB
-- **Format** : Base64 (stockage dans LocalStorage)
-
-### Génération de Billets
-
-1. **Composant Ticket** : Rendu HTML/CSS du billet
-2. **html-to-image** : Conversion en image PNG
-3. **jspdf** : Génération du PDF
-4. **QR Code** : Encodage des données du voyage
-
-### Validation des Jours
-
-Lors de la réservation, le système vérifie que la date sélectionnée correspond à un jour de travail de la compagnie :
+**LocalStorage** avec API sécurisée (`services/storage.ts`):
 
 ```typescript
-const dayIndex = new Date(date).getDay();
-const selectedDay = jsDayToMockDayMap[dayIndex]; // "Lun", "Mar", etc.
-if (!station.workDays.includes(selectedDay)) {
-  // Alerte utilisateur
-}
+// Fonctions CRUD principales
+getUsers(): User[]
+saveUser(user: User): void
+getStations(): Station[]
+saveStation(station: Station): void
+getReservations(): Reservation[]
+createReservation(reservation: Reservation): void
+updateReservation(reservation: Reservation): void  // ✨ Nouveau
+getCurrentUser(): User | null
+setCurrentUser(user: User | null): void
+```
+
+**Clés de stockage**:
+- `vb_users` - Utilisateurs
+- `vb_stations` - Stations/Routes
+- `vb_reservations` - Réservations
+- `vb_current_user` - Session utilisateur
+
+### Génération de Tickets
+
+Le composant `Ticket.tsx` génère des tickets professionnels avec:
+
+1. **Design horizontal** avec section détachable
+2. **QR Code** contenant les données du voyage
+3. **Couleurs du drapeau béninois** en bordure
+4. **Export multi-format**:
+   - PDF (via jsPDF)
+   - PNG (via html-to-image)
+
+```typescript
+// Exemple d'utilisation
+<Ticket data={{
+  id: reservation.id,
+  passengerName: "John Doe",
+  origin: "Cotonou",
+  destination: "Porto-Novo",
+  date: "2025-11-28",
+  departureTime: "08:00",
+  arrivalTime: "10:00",
+  price: 2500,
+  currency: "FCFA",
+  companyName: "Global Trans Co.",
+  ticketClass: "PREMIUM"
+}} />
+```
+
+### Responsive Design
+
+- **Mobile-first** avec Tailwind CSS
+- **Breakpoints**: `sm`, `md`, `lg`, `xl`
+- **Navigation adaptative**:
+  - Desktop: Navbar classique
+  - Mobile: BottomNav avec icônes
+
+### Système de Notifications
+
+Composant `NotificationSystem.tsx` avec 4 types:
+- ✅ `success` - Vert
+- ℹ️ `info` - Bleu
+- ⚠️ `warning` - Jaune
+- ❌ `error` - Rouge
+
+---
+
+## 🔄 Workflow
+
+### Workflow de Réservation
+
+```mermaid
+graph LR
+    A[Client recherche] --> B[Sélectionne trajet]
+    B --> C[Remplit formulaire]
+    C --> D[Réservation créée - PENDING]
+    D --> E[Compagnie valide]
+    E --> F[Statut: COMPLETED]
+    F --> G[Client télécharge ticket final]
+```
+
+### Workflow d'Approbation Compagnie
+
+```mermaid
+graph LR
+    A[Compagnie s'inscrit] --> B[Statut: PENDING]
+    B --> C[Admin vérifie documents]
+    C --> D{Décision}
+    D -->|Approuvé| E[Statut: APPROVED]
+    D -->|Rejeté| F[Statut: REJECTED]
+    E --> G[Compagnie peut créer stations]
+```
+
+### États des Réservations
+
+| Statut | Description | Actions disponibles |
+|--------|-------------|---------------------|
+| `PENDING` | Réservation en attente | Compagnie peut marquer comme payé |
+| `CONFIRMED` | *(Obsolète)* | - |
+| `COMPLETED` | Voyage terminé et payé | Client peut télécharger ticket final |
+| `CANCELLED` | Réservation annulée | Aucune |
+
+---
+
+## 🎨 Composants Clés
+
+### Navbar
+Navigation principale avec:
+- Logo VoyageBj
+- Menu de navigation
+- Boutons d'authentification
+- Menu utilisateur (si connecté)
+
+### BottomNav
+Navigation mobile avec 4 onglets:
+- Dashboard
+- Browse/Tickets
+- Stations (compagnies)
+- Profile
+
+### Ticket
+Génère des tickets professionnels avec:
+- Design horizontal
+- QR Code
+- Informations complètes du voyage
+- Export PDF/PNG
+
+### CompanyDashboard
+Tableau de bord compagnie avec:
+- Statistiques (graphiques Recharts)
+- Gestion des stations
+- Liste des réservations
+- Export PDF/JSON des passagers
+- Profil entreprise
+
+### ClientDashboard
+Tableau de bord voyageur avec:
+- Historique des voyages
+- Recherche de trajets
+- Téléchargement de tickets
+- Profil personnel
+
+### AdminDashboard
+Tableau de bord administrateur avec:
+- Validation des compagnies
+- Visualisation des documents
+- Gestion des utilisateurs
+- Statistiques globales
+
+---
+
+## 🔐 Sécurité
+
+### Validation des Données
+- Validation côté client avec TypeScript
+- Vérification des formats (email, téléphone, NPI)
+- Limitation de taille des images (700Ko max)
+
+### Gestion des Sessions
+- Session utilisateur dans localStorage
+- Vérification du rôle pour l'accès aux pages
+- Déconnexion automatique sur fermeture
+
+### Documents Sensibles
+- Documents stockés en base64
+- Visualisation sécurisée via modal
+- Accès restreint aux administrateurs
+
+---
+
+## 🌐 Internationalisation
+
+L'application est actuellement en **français** avec:
+- Formats de date français (`fr-FR`)
+- Devise: FCFA (Franc CFA)
+- Jours de la semaine: Lun, Mar, Mer, etc.
+
+---
+
+## 📱 Compatibilité
+
+### Navigateurs Supportés
+- ✅ Chrome/Edge (dernières versions)
+- ✅ Firefox (dernières versions)
+- ✅ Safari (dernières versions)
+- ✅ Mobile browsers (iOS Safari, Chrome Mobile)
+
+### Résolutions Testées
+- 📱 Mobile: 375px - 768px
+- 💻 Tablet: 768px - 1024px
+- 🖥 Desktop: 1024px+
+
+---
+
+## 🚧 Limitations Connues
+
+1. **Stockage**: Utilise localStorage (limite ~5-10MB)
+2. **Authentification**: Système basique sans backend
+3. **Temps réel**: Pas de synchronisation multi-utilisateurs
+4. **Paiement**: Pas d'intégration de passerelle de paiement
+
+---
+
+## 🔮 Évolutions Futures
+
+### Court Terme
+- [ ] Backend API (Node.js/Express)
+- [ ] Base de données (PostgreSQL/MongoDB)
+- [ ] Authentification JWT
+- [ ] WebSocket pour temps réel
+
+### Moyen Terme
+- [ ] Intégration paiement mobile (MTN, Moov)
+- [ ] Notifications push
+- [ ] Application mobile (React Native)
+- [ ] Système de notation des compagnies
+
+### Long Terme
+- [ ] IA pour prédiction de trafic
+- [ ] Chatbot support client
+- [ ] Intégration GPS pour suivi en temps réel
+- [ ] API publique pour partenaires
+
+---
+
+## 👨‍💻 Contribution
+
+### Standards de Code
+
+```typescript
+// ✅ Bon
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  // Logic here
+};
+
+// ❌ Mauvais
+const handleSubmit = (e) => {
+  e.preventDefault();
+  // Logic here
+};
+```
+
+### Conventions de Nommage
+- **Composants**: PascalCase (`UserProfile.tsx`)
+- **Fonctions**: camelCase (`getUserData()`)
+- **Constantes**: UPPER_SNAKE_CASE (`API_URL`)
+- **Types**: PascalCase (`User`, `Reservation`)
+
+### Git Workflow
+```bash
+# Créer une branche feature
+git checkout -b feature/nom-feature
+
+# Commit avec message descriptif
+git commit -m "feat: ajout de la fonctionnalité X"
+
+# Push et créer PR
+git push origin feature/nom-feature
 ```
 
 ---
 
-## 🤝 Contribution
+## 📄 License
 
-Les contributions sont les bienvenues ! Voici comment participer :
-
-1. **Fork** le projet
-2. Créez une **branche** pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
-3. **Committez** vos changements (`git commit -m 'Add AmazingFeature'`)
-4. **Push** vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrez une **Pull Request**
-
-### Guidelines
-
-- Suivez les conventions de code TypeScript
-- Ajoutez des commentaires en **français**
-- Testez vos modifications avant de soumettre
-- Mettez à jour la documentation si nécessaire
+Ce projet est **privé** et propriétaire. Tous droits réservés.
 
 ---
 
-## 📄 Licence
+## 📞 Contact
 
-Ce projet est sous licence **MIT**. Voir le fichier `LICENSE` pour plus de détails.
-
----
-
-## 👨‍💻 Auteur
-
-**Elton Hounnou**
-
-- GitHub: [@elton-hounnou](https://github.com/elton-hounnou)
-- Email: contact@voyagebj.com
-
----
-
-## 🙏 Remerciements
-
-- **React Team** pour l'excellent framework
-- **Tailwind Labs** pour TailwindCSS
-- **Lucide Icons** pour les icônes magnifiques
-- **Communauté Open Source** pour les bibliothèques utilisées
+Pour toute question ou support:
+- 📧 Email: admin@voyagebj.com
+- 📱 Téléphone: +229 01 02 03 04
+- 💬 WhatsApp: [Discuter](https://wa.me/22901020304)
 
 ---
 
 <div align="center">
 
-**Fait avec ❤️ au Bénin 🇧🇯**
+**Fait avec ❤️ pour le Bénin 🇧🇯**
 
-[⬆ Retour en haut](#-voyagebj---plateforme-de-réservation-de-transport-interurbain)
+[⬆ Retour en haut](#-voyagebj---plateforme-de-réservation-de-transport-au-bénin)
 
 </div>

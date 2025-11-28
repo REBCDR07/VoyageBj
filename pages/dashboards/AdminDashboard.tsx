@@ -8,6 +8,7 @@ import {
 import { NotifyFunc } from '../../App';
 import { DocumentViewerModal } from '../../components/DocumentViewerModal';
 import { CompanyDetailsModal } from '../../components/CompanyDetailsModal';
+import { BottomNav } from '../../components/BottomNav';
 
 interface Props {
     user: User;
@@ -395,25 +396,6 @@ export const AdminDashboard: React.FC<Props> = ({ user, notify, initialTab = 'da
 
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto min-h-screen pb-20">
-            <div className="mb-8 flex flex-col sm:flex-row justify-center items-center gap-4 sticky top-[60px] z-40 bg-gray-50/90 backdrop-blur-sm py-2">
-                {[
-                    { id: 'dashboard', label: 'Gestion Compagnies', icon: <Shield size={18} /> },
-                    { id: 'profile', label: 'Configuration & Contact', icon: <MoreVertical size={18} /> },
-                ].map(tab => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
-                        className={`
-                        flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all shadow-sm
-                        ${activeTab === tab.id
-                                ? 'btn-benin transform scale-105 ring-2 ring-offset-2 ring-green-500'
-                                : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900 border border-gray-200'}
-                    `}
-                    >
-                        {tab.icon} {tab.label}
-                    </button>
-                ))}
-            </div>
             {activeTab === 'dashboard' && renderDashboard()}
             {activeTab === 'profile' && renderProfile()}
 
@@ -432,6 +414,7 @@ export const AdminDashboard: React.FC<Props> = ({ user, notify, initialTab = 'da
                 onClose={() => setDetailsModal({ ...detailsModal, isOpen: false })}
                 company={companies.find(c => c.id === detailsModal.companyId) || null}
             />
+            <BottomNav user={user} activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
     );
 };

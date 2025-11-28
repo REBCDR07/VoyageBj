@@ -150,6 +150,17 @@ export const createReservation = (reservation: Reservation) => {
   safeSave(STORAGE_KEYS.RESERVATIONS, bookings);
 };
 
+export const updateReservation = (reservation: Reservation) => {
+  const reservations = getReservations();
+  const index = reservations.findIndex(r => r.id === reservation.id);
+  if (index >= 0) {
+    reservations[index] = reservation;
+    safeSave(STORAGE_KEYS.RESERVATIONS, reservations);
+  } else {
+    throw new Error('Réservation introuvable');
+  }
+};
+
 export const getUsers = (): User[] => {
   return safeParse<User[]>(STORAGE_KEYS.USERS, []);
 };

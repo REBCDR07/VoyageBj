@@ -14,7 +14,7 @@ import { StationManager } from './pages/company/StationManager';
 import { SearchResultsPage } from './pages/SearchResultsPage';
 import { CompaniesPage } from './pages/CompaniesPage';
 import { Navbar } from './components/Navbar';
-import { Sidebar } from './components/Sidebar';
+
 import { NotificationSystem, NotificationItem, NotificationVariant, NotificationSender } from './components/NotificationSystem';
 
 export type NotifyType = 'success' | 'error' | 'info';
@@ -45,7 +45,7 @@ const App: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [currentView, setCurrentView] = useState<ViewState>('LANDING');
     const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
     const [appLoading, setAppLoading] = useState(true);
     const [editStationId, setEditStationId] = useState<string | null>(null);
     const [searchParams, setSearchParams] = useState<{ departure: string, arrival: string, date: string } | null>(null);
@@ -183,11 +183,9 @@ const App: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Navbar user={user} onNavigate={handleNavigate} onLogout={handleLogout} onToggleSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)} />
+            <Navbar user={user} onNavigate={handleNavigate} onLogout={handleLogout} />
 
-            {user && isDashboardView && <Sidebar user={user} onNavigate={setCurrentView} onLogout={handleLogout} mobileOpen={mobileSidebarOpen} />}
-
-            <main className={`af-content ${user && isDashboardView ? 'with-sidebar' : ''}`} onClick={() => setMobileSidebarOpen(false)}>
+            <main className="af-content w-full">
                 <NotificationSystem notifications={notifications} removeNotification={removeNotification} />
                 {renderContent()}
             </main>

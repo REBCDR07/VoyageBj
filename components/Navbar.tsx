@@ -6,18 +6,13 @@ interface NavbarProps {
     user: User | null;
     onNavigate: (view: any) => void;
     onLogout: () => void;
-    onToggleSidebar: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onToggleSidebar }) => {
+export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout }) => {
     const [visitorMenuOpen, setVisitorMenuOpen] = useState(false);
 
     const toggleMenu = () => {
-        if (user) {
-            onToggleSidebar();
-        } else {
-            setVisitorMenuOpen(!visitorMenuOpen);
-        }
+        setVisitorMenuOpen(!visitorMenuOpen);
     };
 
     const handleNav = (view: string) => {
@@ -30,16 +25,18 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
             <nav className="fixed top-0 left-0 right-0 z-[1000] bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm transition-all duration-300 supports-[backdrop-filter]:bg-white/60">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16 md:h-20 gap-4">
-                        
+
                         {/* Left Section: Menu Toggle + Brand */}
                         <div className="flex items-center gap-3 md:gap-4">
-                            <button 
-                                onClick={toggleMenu} 
-                                className="p-2.5 -ml-2 text-gray-600 hover:text-[#008751] hover:bg-green-50 rounded-xl focus:outline-none lg:hidden transition-all active:scale-95"
-                                title="Menu Principal"
-                            >
-                                <Menu size={24} strokeWidth={2.5} />
-                            </button>
+                            {!user && (
+                                <button
+                                    onClick={toggleMenu}
+                                    className="p-2.5 -ml-2 text-gray-600 hover:text-[#008751] hover:bg-green-50 rounded-xl focus:outline-none lg:hidden transition-all active:scale-95"
+                                    title="Menu Principal"
+                                >
+                                    <Menu size={24} strokeWidth={2.5} />
+                                </button>
+                            )}
 
                             {/* Brand */}
                             <div
@@ -64,8 +61,8 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                         {/* Right Section: Actions */}
                         <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
                             {/* Home Button (Visible on all sizes, refined) */}
-                            <button 
-                                onClick={() => onNavigate('LANDING')} 
+                            <button
+                                onClick={() => onNavigate('LANDING')}
                                 className="p-2.5 text-gray-400 hover:text-[#008751] hover:bg-gray-50 rounded-xl transition-all active:scale-95 hidden sm:block"
                                 title="Retour à l'accueil"
                             >
@@ -90,9 +87,9 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                                                 <p className="text-sm font-bold text-gray-800 leading-tight truncate max-w-[120px]">{user.companyName || user.name}</p>
                                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">{user.role === 'ADMIN' ? 'Admin' : (user.role === 'COMPANY' ? 'Partenaire' : 'Voyageur')}</p>
                                             </div>
-                                            <img 
-                                                src={user.avatarUrl} 
-                                                alt="Profile" 
+                                            <img
+                                                src={user.avatarUrl}
+                                                alt="Profile"
                                                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-white shadow-md object-cover bg-gray-100 ring-1 ring-gray-100"
                                             />
                                         </button>
@@ -100,18 +97,18 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                                         {/* Dropdown Menu */}
                                         <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hidden group-hover:block z-50 animate-fade-in origin-top-right">
                                             <div className="p-2 space-y-1">
-                                                <button 
+                                                <button
                                                     onClick={() => {
                                                         onNavigate(user.role === 'COMPANY' ? 'DASHBOARD_COMPANY' : (user.role === 'ADMIN' ? 'DASHBOARD_ADMIN' : 'DASHBOARD_CLIENT'));
                                                         setVisitorMenuOpen(false);
-                                                    }} 
+                                                    }}
                                                     className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-[#008751] font-bold rounded-xl transition-colors flex items-center gap-3"
                                                 >
                                                     <LayoutDashboard size={18} /> Tableau de bord
                                                 </button>
                                                 <div className="h-px bg-gray-100 my-1 mx-2"></div>
-                                                <button 
-                                                    onClick={onLogout} 
+                                                <button
+                                                    onClick={onLogout}
                                                     className="w-full text-left px-4 py-3 text-sm text-[#e8112d] hover:bg-red-50 font-bold rounded-xl transition-colors flex items-center gap-3"
                                                 >
                                                     <LogOut size={18} /> Se déconnecter
@@ -123,30 +120,30 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                             ) : (
                                 /* Visitor State (Desktop) */
                                 <div className="hidden lg:flex items-center gap-2 bg-gray-50/50 p-1.5 rounded-full border border-gray-100">
-                                    <button 
-                                        onClick={() => onNavigate('LOGIN_VOYAGEUR')} 
+                                    <button
+                                        onClick={() => onNavigate('LOGIN_VOYAGEUR')}
                                         className="text-sm font-bold text-gray-600 hover:text-[#008751] transition-colors px-4 py-2 rounded-full hover:bg-white"
                                     >
                                         Je voyage
                                     </button>
                                     <div className="w-px h-4 bg-gray-300"></div>
-                                    <button 
-                                        onClick={() => onNavigate('LOGIN_COMPANY')} 
+                                    <button
+                                        onClick={() => onNavigate('LOGIN_COMPANY')}
                                         className="text-sm font-bold text-gray-600 hover:text-[#008751] transition-colors px-4 py-2 rounded-full hover:bg-white"
                                     >
                                         Partenaires
                                     </button>
-                                    
-                                    <button 
-                                        onClick={() => onNavigate('LOGIN_ADMIN')} 
+
+                                    <button
+                                        onClick={() => onNavigate('LOGIN_ADMIN')}
                                         className="ml-2 text-xs font-bold text-gray-400 hover:text-gray-800 px-3 py-2 transition-colors border border-transparent hover:border-gray-200 rounded-full"
                                         title="Accès Administration"
                                     >
                                         Admin
                                     </button>
 
-                                    <button 
-                                        onClick={() => onNavigate('LOGIN_VOYAGEUR')} 
+                                    <button
+                                        onClick={() => onNavigate('LOGIN_VOYAGEUR')}
                                         className="ml-2 bg-[#008751] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-green-200 hover:bg-[#006b40] hover:shadow-green-300 transition-all transform active:scale-95"
                                     >
                                         Connexion
@@ -178,8 +175,8 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                                     </div>
                                     <span className="font-black text-xl text-gray-900 tracking-tight">VoyageBj</span>
                                 </div>
-                                <button 
-                                    onClick={() => setVisitorMenuOpen(false)} 
+                                <button
+                                    onClick={() => setVisitorMenuOpen(false)}
                                     className="p-2.5 bg-white border border-gray-200 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all active:scale-95"
                                 >
                                     <X size={20} />
@@ -190,8 +187,8 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                             <div className="p-6 space-y-3 flex-1 overflow-y-auto">
                                 <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Espace Membre</p>
 
-                                <button 
-                                    onClick={() => handleNav('LOGIN_VOYAGEUR')} 
+                                <button
+                                    onClick={() => handleNav('LOGIN_VOYAGEUR')}
                                     className="w-full flex items-center justify-between p-4 bg-white border border-gray-100 hover:border-green-200 hover:bg-green-50 rounded-2xl group transition-all shadow-sm hover:shadow-md active:scale-98"
                                 >
                                     <div className="flex items-center gap-4">
@@ -208,8 +205,8 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                                     </div>
                                 </button>
 
-                                <button 
-                                    onClick={() => handleNav('LOGIN_COMPANY')} 
+                                <button
+                                    onClick={() => handleNav('LOGIN_COMPANY')}
                                     className="w-full flex items-center justify-between p-4 bg-white border border-gray-100 hover:border-yellow-200 hover:bg-yellow-50 rounded-2xl group transition-all shadow-sm hover:shadow-md active:scale-98"
                                 >
                                     <div className="flex items-center gap-4">
@@ -226,8 +223,8 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                                     </div>
                                 </button>
 
-                                <button 
-                                    onClick={() => handleNav('LOGIN_ADMIN')} 
+                                <button
+                                    onClick={() => handleNav('LOGIN_ADMIN')}
                                     className="w-full flex items-center justify-between p-4 bg-white border border-gray-100 hover:border-gray-300 hover:bg-gray-50 rounded-2xl group transition-all shadow-sm hover:shadow-md active:scale-98"
                                 >
                                     <div className="flex items-center gap-4">
@@ -254,8 +251,8 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout, onTo
                                         <p className="font-black text-lg text-gray-900 tracking-tight">+229 97 00 00 00</p>
                                     </div>
                                 </div>
-                                <button 
-                                    onClick={() => handleNav('SIGNUP_VOYAGEUR')} 
+                                <button
+                                    onClick={() => handleNav('SIGNUP_VOYAGEUR')}
                                     className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#008751] to-[#006b40] text-white font-bold text-base shadow-lg shadow-green-200 hover:shadow-green-300 active:scale-95 transition-all"
                                 >
                                     Créer un compte

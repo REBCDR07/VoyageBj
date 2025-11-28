@@ -2,12 +2,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Station, Reservation } from '../../types';
 import { getStations, getReservations, createReservation, getUsers, saveUser } from '../../services/storage';
-import { MapPin, Calendar, Clock, Bus, CheckCircle, ArrowRight, Download, User as UserIcon, Phone, Mail, Edit, CreditCard, Camera, X, ChevronLeft, Image as ImageIcon, FileText } from 'lucide-react';
+import {
+    MapPin, Search, Calendar, Clock, User as UserIcon, Settings, LogOut,
+    ChevronRight, Star, Shield, Bus, ArrowRight, X, CreditCard, CheckCircle, FileText, Download, Ticket as TicketIcon,
+    Camera, Mail, Phone, ChevronLeft
+} from 'lucide-react';
 import { NotifyFunc } from '../../App';
 // @ts-ignore
 import html2canvas from 'html2canvas';
 // @ts-ignore
 import { jsPDF } from 'jspdf';
+import { BottomNav } from '../../components/BottomNav';
+import { Ticket } from '../../components/Ticket';
 
 interface Props {
     user: User;
@@ -15,7 +21,7 @@ interface Props {
 }
 
 export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
-    const [view, setView] = useState<'dashboard' | 'browse' | 'company_profile' | 'profile'>('dashboard');
+    const [view, setView] = useState<'dashboard' | 'browse' | 'company_profile' | 'profile' | 'tickets'>('dashboard');
     const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
     const [allStations, setAllStations] = useState<Station[]>([]);
     const [companies, setCompanies] = useState<User[]>([]);
@@ -57,7 +63,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
         const selectedDayName = jsDayToMockDayMap[dayIndex];
 
         if (bookingStation.workDays && bookingStation.workDays.length > 0 && !bookingStation.workDays.includes(selectedDayName)) {
-            notify(`Trajet indisponible le ${selectedDayName}. Jours disponibles : ${bookingStation.workDays.join(', ')}.`, "error");
+            notify(`Trajet indisponible le ${selectedDayName}. Jours disponibles: ${bookingStation.workDays.join(', ')}.`, "error");
             setBookingForm({ ...bookingForm, date: '' });
             return;
         }
@@ -83,19 +89,19 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
             clientName: bookingForm.name,
             clientEmail: bookingForm.email,
             clientPhone: bookingForm.phone,
-            routeSummary: `${bookingStation.pointA} vers ${bookingStation.pointB}`,
+            routeSummary: `${bookingStation.pointA} vers ${bookingStation.pointB} `,
             departureDate: bookingForm.date,
             departureTime: depTime,
             pricePaid: price,
             ticketClass: bookingForm.ticketClass,
-            status: 'CONFIRMED',
+            status: 'PENDING',
             createdAt: new Date().toISOString()
         };
 
         try {
             createReservation(reservation);
             setBookingStation(null);
-            notify(`Réservation confirmée avec ${bookingStation.companyName}`, "success");
+            notify(`Réservation confirmée avec ${bookingStation.companyName} `, "success");
             refreshData();
             setView('dashboard');
             setViewingTicket(reservation);
@@ -147,9 +153,9 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
     const downloadTicketImage = async () => {
         if (!ticketRef.current) return;
         try {
-            const canvas = await html2canvas(ticketRef.current, { 
-                scale: 2, 
-                useCORS: true, 
+            const canvas = await html2canvas(ticketRef.current, {
+                scale: 2,
+                useCORS: true,
                 backgroundColor: '#ffffff', // Force le fond blanc
                 logging: false,
                 allowTaint: false
@@ -157,7 +163,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
             const image = canvas.toDataURL("image/png");
             const link = document.createElement("a");
             link.href = image;
-            link.download = `VoyageBj-Ticket-${viewingTicket?.id.substring(0, 8)}.png`;
+            link.download = `VoyageBj - Ticket - ${viewingTicket?.id.substring(0, 8)}.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -172,15 +178,15 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
     const downloadTicketPDF = async () => {
         if (!ticketRef.current) return;
         try {
-            const canvas = await html2canvas(ticketRef.current, { 
-                scale: 2, 
-                useCORS: true, 
+            const canvas = await html2canvas(ticketRef.current, {
+                scale: 2,
+                useCORS: true,
                 backgroundColor: '#ffffff',
                 logging: false,
                 allowTaint: false
             });
             const imgData = canvas.toDataURL('image/png');
-            
+
             // Configuration PDF (Paysage car le ticket est large)
             const pdf = new jsPDF({
                 orientation: 'landscape',
@@ -191,7 +197,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
             const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
-            
+
             // Calculer les dimensions pour faire tenir l'image
             const ratio = imgProps.width / imgProps.height;
             let finalWidth = pdfWidth - 20; // Marge de 10mm
@@ -204,9 +210,9 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
 
             const x = (pdfWidth - finalWidth) / 2;
             const y = (pdfHeight - finalHeight) / 2;
-            
+
             pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
-            pdf.save(`VoyageBj-Ticket-${viewingTicket?.id.substring(0, 8)}.pdf`);
+            pdf.save(`VoyageBj - Ticket - ${viewingTicket?.id.substring(0, 8)}.pdf`);
             notify("Ticket téléchargé en PDF !", "success");
         } catch (e) {
             console.error(e);
@@ -222,24 +228,24 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                     <p className="text-green-100 text-sm mt-1 relative z-10">Gérez vos informations personnelles</p>
                     <div className="absolute top-0 left-0 w-full h-full bg-white/5 opacity-50 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                 </div>
-                
+
                 <div className="p-6 md:p-8">
                     <form onSubmit={handleUpdateProfile} className="space-y-6">
                         <div className="flex justify-center -mt-20 mb-8 relative z-10">
                             <div className="relative group cursor-pointer inline-block">
                                 <div className="w-32 h-32 rounded-full border-[6px] border-white shadow-xl overflow-hidden bg-gray-100">
-                                    <img 
-                                        src={profileForm.avatarUrl || `https://ui-avatars.com/api/?name=${user.name}&background=008751&color=fff`} 
-                                        className="w-full h-full object-cover" 
-                                        alt="Profil" 
+                                    <img
+                                        src={profileForm.avatarUrl || `https://ui-avatars.com/api/?name=${user.name}&background=008751&color=fff`}
+                                        className="w-full h-full object-cover"
+                                        alt="Profil"
                                     />
-                                </div>
+                                </div >
                                 <label className="absolute bottom-1 right-1 bg-[#008751] hover:bg-[#006b40] text-white p-2.5 rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110 border-2 border-white">
                                     <Camera size={16} />
                                     <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
                                 </label>
-                            </div>
-                        </div>
+                            </div >
+                        </div >
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div className="space-y-2">
@@ -249,7 +255,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                     <input type="text" className="w-full rounded-2xl border border-gray-200 bg-gray-50 p-3.5 pl-11 focus:ring-2 focus:ring-[#008751] focus:border-transparent outline-none transition-all font-medium text-base" value={profileForm.name || ''} onChange={e => setProfileForm({ ...profileForm, name: e.target.value })} />
                                 </div>
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <label className="block text-sm font-bold text-gray-700 ml-1">Email</label>
                                 <div className="relative">
@@ -280,45 +286,28 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                 <CheckCircle size={20} /> Enregistrer
                             </button>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+                    </form >
+                </div >
+            </div >
+        </div >
     );
 
     const renderDashboard = () => (
         <div className="animate-fade-in space-y-8">
-            {/* Carte Hero */}
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-[#008751]">
-                {/* Éléments décoratifs */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4"></div>
-                
-                <div className="relative p-8 md:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-                    <div className="max-w-lg">
-                        <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-white/20">
-                            <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span> Espace Client
-                        </div>
-                        <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight">Bonjour,<br/>{user.name.split(' ')[0]} 👋</h1>
-                        <p className="text-green-50 text-lg font-medium opacity-90">Prêt pour votre prochain voyage au Bénin ?</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
-                        <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 flex flex-col items-center justify-center text-center">
-                            <span className="text-3xl font-bold">{myReservations.length}</span>
-                            <span className="text-xs uppercase font-bold opacity-80">Voyages</span>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 flex flex-col items-center justify-center text-center">
-                            <span className="text-3xl font-bold">{companies.length}</span>
-                            <span className="text-xs uppercase font-bold opacity-80">Agences</span>
-                        </div>
-                        <button 
-                            onClick={() => setView('browse')}
-                            className="col-span-2 bg-white text-[#008751] p-4 rounded-2xl font-bold shadow-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
-                        >
-                            Réserver <ArrowRight size={18} />
-                        </button>
-                    </div>
+            {/* Header Section */}
+            <div className="bg-[#008751] rounded-3xl p-8 text-white shadow-xl shadow-green-100 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-3xl"></div>
+                <div className="relative z-10">
+                    <h1 className="text-3xl font-black mb-2">Bonjour, {user.name.split(' ')[0]} 👋</h1>
+                    <p className="text-green-100 font-medium text-lg">Prêt pour votre prochain voyage ?</p>
+
+                    <button
+                        onClick={() => setView('browse')}
+                        className="mt-6 bg-white text-[#008751] px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2"
+                    >
+                        <Search size={20} strokeWidth={2.5} />
+                        Rechercher un trajet
+                    </button>
                 </div>
             </div>
 
@@ -330,7 +319,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                         Mes Derniers Voyages
                     </h2>
                 </div>
-                
+
                 <div className="grid grid-cols-1 gap-4">
                     {myReservations.length > 0 ? (
                         myReservations.map(res => (
@@ -360,8 +349,8 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                             <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Prix</p>
                                             <p className="font-black text-lg text-[#008751]">{res.pricePaid.toLocaleString()} FCFA</p>
                                         </div>
-                                        <button 
-                                            onClick={() => setViewingTicket(res)} 
+                                        <button
+                                            onClick={() => setViewingTicket(res)}
                                             className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-black text-white rounded-xl text-sm font-bold shadow-lg shadow-gray-200 transition-all active:scale-95 whitespace-nowrap"
                                         >
                                             <Download size={18} /> Ticket
@@ -377,8 +366,8 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                             </div>
                             <h3 className="text-lg font-bold text-gray-800 mb-1">Aucun voyage pour le moment</h3>
                             <p className="text-gray-500 max-w-xs mx-auto mb-6 text-sm">Votre historique de voyage apparaîtra ici une fois que vous aurez effectué une réservation.</p>
-                            <button 
-                                onClick={() => setView('browse')} 
+                            <button
+                                onClick={() => setView('browse')}
                                 className="px-6 py-3 bg-[#008751] text-white rounded-xl font-bold hover:bg-[#006b40] shadow-lg shadow-green-100 transition-all text-sm"
                             >
                                 Trouver un trajet
@@ -394,8 +383,8 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
         <div className="animate-fade-in space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                 <div className="flex items-center gap-4">
-                    <button 
-                        onClick={() => setView('dashboard')} 
+                    <button
+                        onClick={() => setView('dashboard')}
                         className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors border border-gray-100 shrink-0"
                     >
                         <ChevronLeft size={24} />
@@ -409,8 +398,8 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {companies.map(company => (
-                    <div 
-                        key={company.id} 
+                    <div
+                        key={company.id}
                         className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col h-full"
                         onClick={() => { setSelectedCompanyId(company.id); setView('company_profile'); }}
                     >
@@ -427,21 +416,28 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                 <span className="bg-[#008751] text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-sm tracking-wide uppercase">Certifié</span>
                             </div>
                         </div>
-                        
+
                         <div className="p-6 pt-12 relative flex-1 flex flex-col">
                             <div className="absolute -top-10 left-6">
-                                <img 
-                                    src={company.avatarUrl || `https://ui-avatars.com/api/?name=${company.companyName}&background=random`} 
-                                    alt={company.companyName} 
-                                    className="w-20 h-20 rounded-2xl object-cover border-[4px] border-white shadow-md bg-white" 
+                                <img
+                                    src={company.avatarUrl || `https://ui-avatars.com/api/?name=${company.companyName}&background=random`}
+                                    alt={company.companyName}
+                                    className="w-20 h-20 rounded-2xl object-cover border-[4px] border-white shadow-md bg-white"
                                 />
                             </div>
-                            
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{company.companyName}</h3>
+
+                            <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-xl font-bold text-gray-900">{company.companyName}</h3>
+                                {company.status === 'APPROVED' && (
+                                    <div className="bg-blue-100 text-blue-600 p-1 rounded-full" title="Compagnie Vérifiée">
+                                        <CheckCircle size={14} strokeWidth={3} />
+                                    </div>
+                                )}
+                            </div>
                             <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed flex-1">
                                 {company.description || `Voyagez confortablement et en toute sécurité avec ${company.companyName} à travers tout le Bénin.`}
                             </p>
-                            
+
                             <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
                                 <div className="flex flex-col">
                                     <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Réseau</span>
@@ -474,18 +470,18 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
                     </div>
-                    
-                    <button 
-                        onClick={() => setView('browse')} 
+
+                    <button
+                        onClick={() => setView('browse')}
                         className="absolute top-6 left-6 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-white/30 transition-colors border border-white/20 z-20"
                     >
                         <ChevronLeft size={24} />
                     </button>
 
                     <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 flex flex-col md:flex-row items-end md:items-center gap-6">
-                        <img 
-                            src={company?.avatarUrl || `https://ui-avatars.com/api/?name=${company?.companyName}`} 
-                            className="w-24 h-24 rounded-2xl border-4 border-white shadow-xl bg-white object-cover" 
+                        <img
+                            src={company?.avatarUrl || `https://ui-avatars.com/api/?name=${company?.companyName}`}
+                            className="w-24 h-24 rounded-2xl border-4 border-white shadow-xl bg-white object-cover"
                             alt="Logo"
                         />
                         <div className="flex-1 mb-2">
@@ -506,16 +502,16 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                         <div className="w-1 h-6 bg-[#008751] rounded-full"></div>
                         <h3 className="text-xl font-bold text-gray-900">Trajets disponibles</h3>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 gap-5">
                         {companyStations.map(station => (
                             <div key={station.id} className="bg-white rounded-3xl border border-gray-100 p-5 shadow-sm hover:shadow-lg hover:border-green-200 transition-all group flex flex-col md:flex-row gap-6">
                                 {/* Image */}
                                 <div className="w-full md:w-64 h-48 rounded-2xl overflow-hidden relative shrink-0">
-                                    <img 
-                                        src={station.photoUrl || `https://source.unsplash.com/random/400x300/?bus,station`} 
-                                        alt={station.name} 
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                    <img
+                                        src={station.photoUrl || `https://source.unsplash.com/random/400x300/?bus,station`}
+                                        alt={station.name}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                     <div className="absolute top-3 right-3">
                                         <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider shadow-sm ${station.type === 'STATION' ? 'bg-blue-600 text-white' : 'bg-orange-500 text-white'}`}>
@@ -558,8 +554,8 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                             ))}
                                             {station.workDays.length > 5 && <span className="text-xs text-gray-400 self-center font-medium">...</span>}
                                         </div>
-                                        <button 
-                                            onClick={() => { setBookingStation(station); setBookingForm({ ...bookingForm, date: '', timeIndex: '', ticketClass: 'STANDARD' }); }} 
+                                        <button
+                                            onClick={() => { setBookingStation(station); setBookingForm({ ...bookingForm, date: '', timeIndex: '', ticketClass: 'STANDARD' }); }}
                                             className="w-full sm:w-auto px-8 py-3 bg-[#008751] text-white rounded-xl font-bold hover:bg-[#006b40] shadow-lg shadow-green-200 hover:shadow-green-300 transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
                                         >
                                             Réserver <ArrowRight size={18} />
@@ -574,167 +570,102 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
         );
     };
 
+    const renderTickets = () => (
+        <div className="animate-fade-in space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <FileText className="text-[#008751]" size={24} />
+                Mes Tickets
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {myReservations.length > 0 ? (
+                    myReservations.map(res => (
+                        <div key={res.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-full">
+                            <div className="mb-4">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="font-bold text-lg text-gray-900">{res.routeSummary}</h3>
+                                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${res.ticketClass === 'PREMIUM' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
+                                        {res.ticketClass}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-gray-500 flex items-center gap-2">
+                                    <Calendar size={14} /> {res.departureDate} à {res.departureTime}
+                                </p>
+                                <p className="text-sm text-gray-500 flex items-center gap-2 mt-1">
+                                    <Bus size={14} /> {companies.find(c => c.id === res.companyId)?.companyName || 'Compagnie'}
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mt-auto">
+                                <button
+                                    onClick={() => setViewingTicket(res)}
+                                    className="bg-gray-900 text-white py-3 px-4 rounded-xl hover:bg-black transition-colors text-xs font-bold flex flex-col items-center gap-1"
+                                >
+                                    <TicketIcon size={16} />
+                                    Ticket Réservation
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (res.status === 'COMPLETED') {
+                                            setViewingTicket(res); // In a real app, this might be a different ticket object
+                                        } else {
+                                            notify("Le voyage doit être marqué comme 'Payé & Arrivé' par la compagnie.", "info");
+                                        }
+                                    }}
+                                    disabled={res.status !== 'COMPLETED'}
+                                    className={`py-3 px-4 rounded-xl transition-colors text-xs font-bold flex flex-col items-center gap-1 border ${res.status === 'COMPLETED' ? 'bg-[#008751] text-white hover:bg-[#006b40] border-transparent' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}
+                                >
+                                    <CheckCircle size={16} />
+                                    Ticket Destination
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="col-span-full text-center py-10 text-gray-500">Aucun ticket disponible.</div>
+                )}
+            </div>
+        </div>
+    );
+
     const renderTicketModal = () => {
         if (!viewingTicket) return null;
 
         const station = allStations.find(s => s.id === viewingTicket.stationId);
         const depIndex = station?.departureHours.indexOf(viewingTicket.departureTime) ?? 0;
         const arrivalTime = station?.arrivalHours?.[depIndex] || '--:--';
-        
+        const company = companies.find(c => c.id === viewingTicket.companyId);
+
         const origin = viewingTicket.routeSummary.split(' vers ')[0];
         const destination = viewingTicket.routeSummary.split(' vers ')[1];
-        
-        const originCode = origin.substring(0, 3).toUpperCase();
-        const destCode = destination.substring(0, 3).toUpperCase();
+
+        const ticketData = {
+            id: viewingTicket.id,
+            passengerName: viewingTicket.clientName,
+            contact: viewingTicket.clientPhone,
+            origin: origin,
+            destination: destination,
+            date: viewingTicket.departureDate,
+            departureTime: viewingTicket.departureTime,
+            arrivalTime: arrivalTime,
+            price: viewingTicket.pricePaid,
+            currency: 'FCFA',
+            companyName: company?.companyName || 'VoyageBj',
+            ticketClass: viewingTicket.ticketClass
+        };
 
         return (
             <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-fade-in overflow-y-auto">
                 <div className="relative w-full max-w-3xl my-auto animate-scale-up">
-                    <button 
-                        onClick={() => setViewingTicket(null)} 
-                        className="absolute -top-12 right-0 md:-right-12 text-white/80 hover:text-white flex items-center gap-2 font-bold transition-colors bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm z-50"
+                    {/* Bouton de fermeture amélioré */}
+                    <button
+                        onClick={() => setViewingTicket(null)}
+                        className="absolute -top-14 right-0 md:-right-14 w-12 h-12 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border-2 border-white/30 shadow-lg z-50 group"
+                        title="Fermer"
                     >
-                        <X size={20} /> <span className="md:hidden">Fermer</span>
+                        <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
                     </button>
-                    
-                    <div ref={ticketRef} className="bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row w-full relative">
-                        {/* Barre supérieure décorative (Visible sur mobile, s'étend sur toute la largeur) */}
-                        <div className="absolute top-0 left-0 w-full h-1.5 flex z-20">
-                            <div className="w-1/3 h-full bg-[#008751]"></div>
-                            <div className="w-1/3 h-full bg-[#FCD116]"></div>
-                            <div className="w-1/3 h-full bg-[#E01F26]"></div>
-                        </div>
 
-                        {/* Section Gauche - Informations principales */}
-                        <div className="flex-1 p-6 md:p-8 bg-white relative">
-                            {/* En-tête */}
-                            <div className="flex justify-between items-start mt-2 mb-8">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 md:w-12 md:h-12 bg-[#008751] rounded-xl flex items-center justify-center text-white shadow-green-200 shadow-lg">
-                                        <Bus size={20} />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-none">VoyageBj</h2>
-                                        <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Agence de voyage</span>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Classe</span>
-                                    <span className={`block text-lg md:text-xl font-black uppercase ${viewingTicket.ticketClass === 'PREMIUM' ? 'text-yellow-500' : 'text-[#008751]'}`}>
-                                        {viewingTicket.ticketClass}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Trajet */}
-                            <div className="flex items-center justify-between mb-8 relative px-2">
-                                {/* Ligne de connexion */}
-                                <div className="absolute left-10 right-10 top-1/2 h-0.5 bg-gray-100 -z-10"></div>
-                                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2">
-                                     <div className="w-8 h-8 rounded-full border-2 border-[#008751] flex items-center justify-center text-[#008751] bg-white">
-                                        <Bus size={14} />
-                                    </div>
-                                </div>
-
-                                <div className="text-left bg-white pr-2">
-                                    <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">De</span>
-                                    <h3 className="text-3xl md:text-4xl font-black text-gray-900">{originCode}</h3>
-                                    <p className="text-xs md:text-sm font-bold text-gray-500 uppercase mt-0.5 max-w-[100px] truncate">{origin}</p>
-                                </div>
-
-                                <div className="text-right bg-white pl-2">
-                                    <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">À</span>
-                                    <h3 className="text-3xl md:text-4xl font-black text-gray-900">{destCode}</h3>
-                                    <p className="text-xs md:text-sm font-bold text-gray-500 uppercase mt-0.5 max-w-[100px] truncate">{destination}</p>
-                                </div>
-                            </div>
-                            
-                            <div className="flex justify-center mb-6">
-                                <span className="bg-gray-100 text-gray-600 text-xs font-bold px-4 py-1.5 rounded-full border border-gray-200">
-                                    {new Date(viewingTicket.departureDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                                </span>
-                            </div>
-
-                            {/* Pied de page des détails */}
-                            <div className="grid grid-cols-3 gap-2 md:gap-4 bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                                <div className="col-span-1">
-                                    <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Passager</span>
-                                    <p className="font-bold text-gray-900 text-sm md:text-base truncate">{viewingTicket.clientName}</p>
-                                </div>
-                                <div className="text-center col-span-1 border-l border-r border-gray-200/50">
-                                    <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Départ</span>
-                                    <p className="font-black text-xl md:text-2xl text-[#008751]">{viewingTicket.departureTime.replace(':', 'H')}</p>
-                                </div>
-                                <div className="text-right col-span-1">
-                                    <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Arrivée</span>
-                                    <p className="font-black text-xl md:text-2xl text-gray-900">{arrivalTime.replace(':', 'H')}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Séparateur avec découpe */}
-                        <div className="relative flex md:flex-col items-center justify-between">
-                            {/* Cercles de masquage */}
-                            <div className="absolute -left-3 md:left-auto md:-top-3 w-6 h-6 rounded-full bg-gray-900 z-10"></div>
-                            <div className="absolute -right-3 md:right-auto md:-bottom-3 w-6 h-6 rounded-full bg-gray-900 z-10"></div>
-                            
-                            {/* Ligne pointillée */}
-                            <div className="w-full h-px md:w-px md:h-full border-t-2 md:border-t-0 md:border-l-2 border-dashed border-gray-300 my-4 md:my-0"></div>
-                        </div>
-
-                        {/* Section Droite - Talon d'embarquement */}
-                        <div className="md:w-72 bg-[#008751] p-6 md:p-8 flex flex-col items-center justify-between text-white relative">
-                             {/* Bandes latérales pour Desktop */}
-                            <div className="hidden md:flex absolute top-0 right-0 h-full w-1.5 flex-col">
-                                <div className="h-1/3 bg-[#FCD116]"></div>
-                                <div className="h-1/3 bg-[#E01F26]"></div>
-                                <div className="h-1/3 bg-[#008751]"></div>
-                            </div>
-
-                            <div className="text-center">
-                                <h3 className="font-black text-lg tracking-widest uppercase">Boarding Pass</h3>
-                                <p className="text-[10px] text-green-100/80 uppercase tracking-widest mt-1">Billet de passage</p>
-                            </div>
-
-                            <div className="bg-white p-3 rounded-2xl shadow-xl my-6 w-40 h-40 flex flex-col items-center justify-center relative group">
-                                <img 
-                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${viewingTicket.id}`} 
-                                    alt="Code QR" 
-                                    className="w-full h-full object-contain" 
-                                    crossOrigin="anonymous"
-                                />
-                                <div className="mt-1 text-[9px] font-mono text-gray-500 font-bold">{viewingTicket.id.substring(0,8).toUpperCase()}</div>
-                            </div>
-
-                            <div className="text-center w-full">
-                                <div className="w-full h-px bg-green-400/30 mb-4"></div>
-                                <span className="block text-xs font-bold text-green-100 uppercase tracking-wider mb-1">Prix Total</span>
-                                <p className="font-black text-3xl md:text-4xl">{viewingTicket.pricePaid.toLocaleString()} <span className="text-lg align-top">F</span></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Actions de téléchargement et fermeture */}
-                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
-                        <button 
-                            onClick={() => setViewingTicket(null)}
-                            className="w-full sm:w-auto px-6 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl font-bold flex items-center justify-center gap-2 backdrop-blur-md transition-all"
-                        >
-                            <X size={18} /> Fermer
-                        </button>
-                        <button 
-                            onClick={downloadTicketImage}
-                            className="w-full sm:w-auto px-6 py-3 bg-white text-[#008751] rounded-xl font-bold hover:bg-green-50 shadow-lg flex items-center justify-center gap-2 transition-all"
-                        >
-                            <ImageIcon size={18} /> Télécharger Image
-                        </button>
-                         <button 
-                            onClick={downloadTicketPDF}
-                            className="w-full sm:w-auto px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black shadow-lg flex items-center justify-center gap-2 transition-all"
-                        >
-                            <FileText size={18} /> Télécharger PDF
-                        </button>
-                    </div>
+                    <Ticket data={ticketData} />
                 </div>
             </div>
         );
@@ -765,193 +696,167 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                 {view === 'browse' && renderBrowse()}
                 {view === 'company_profile' && renderCompanyProfile()}
                 {view === 'profile' && renderProfile()}
+                {view === 'tickets' && renderTickets()}
             </main>
 
-            {/* Navigation inférieure mobile (Glassmorphism) */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-200 px-6 py-2 pb-safe z-40 flex justify-between items-center shadow-[0_-4px_20px_rgba(0,0,0,0.03)] h-20">
-                <button 
-                    onClick={() => setView('dashboard')} 
-                    className={`flex flex-col items-center gap-1 transition-all w-16 ${view === 'dashboard' ? 'text-[#008751] scale-105' : 'text-gray-400 hover:text-gray-600'}`}
-                >
-                    <div className={`p-1.5 rounded-xl ${view === 'dashboard' ? 'bg-green-100' : 'bg-transparent'}`}>
-                        <Bus size={22} strokeWidth={view === 'dashboard' ? 2.5 : 2} />
-                    </div>
-                    <span className="text-[10px] font-bold">Accueil</span>
-                </button>
-                
-                <button 
-                    onClick={() => setView('browse')} 
-                    className={`flex flex-col items-center gap-1 transition-all w-16 ${view === 'browse' || view === 'company_profile' ? 'text-[#008751] scale-105' : 'text-gray-400 hover:text-gray-600'}`}
-                >
-                    <div className={`p-1.5 rounded-xl ${view === 'browse' || view === 'company_profile' ? 'bg-green-100' : 'bg-transparent'}`}>
-                        <MapPin size={22} strokeWidth={view === 'browse' || view === 'company_profile' ? 2.5 : 2} />
-                    </div>
-                    <span className="text-[10px] font-bold">Réserver</span>
-                </button>
-                
-                <button 
-                    onClick={() => setView('profile')} 
-                    className={`flex flex-col items-center gap-1 transition-all w-16 ${view === 'profile' ? 'text-[#008751] scale-105' : 'text-gray-400 hover:text-gray-600'}`}
-                >
-                    <div className={`p-1.5 rounded-xl ${view === 'profile' ? 'bg-green-100' : 'bg-transparent'}`}>
-                        <UserIcon size={22} strokeWidth={view === 'profile' ? 2.5 : 2} />
-                    </div>
-                    <span className="text-[10px] font-bold">Profil</span>
-                </button>
-            </div>
+            {/* Navigation inférieure */}
+            <BottomNav user={user} activeTab={view} onTabChange={setView} />
+
 
             {/* Modal de réservation */}
-            {bookingStation && (
-                <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-end md:items-center justify-center z-[50] p-0 md:p-4 animate-fade-in">
-                    <div className="bg-white w-full max-w-lg md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] md:max-h-[90vh] animate-slide-up-mobile md:animate-scale-up">
-                        
-                        {/* En-tête Modal */}
-                        <div className="bg-[#008751] px-6 py-5 text-white relative shrink-0">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                                    <Bus size={20} className="text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-black uppercase tracking-wide">Réservation</h3>
-                                    <p className="text-green-100 text-xs font-medium opacity-90">Veuillez compléter vos informations</p>
-                                </div>
-                            </div>
-                            <button 
-                                onClick={() => setBookingStation(null)} 
-                                className="absolute top-5 right-5 text-white/80 hover:text-white hover:bg-white/20 p-2 rounded-full transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
+            {
+                bookingStation && (
+                    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-end md:items-center justify-center z-[50] p-0 md:p-4 animate-fade-in">
+                        <div className="bg-white w-full max-w-lg md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] md:max-h-[90vh] animate-slide-up-mobile md:animate-scale-up">
 
-                        {/* Corps Modal */}
-                        <div className="overflow-y-auto p-6 space-y-6">
-                            {/* Carte Info Trajet */}
-                            <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 bg-[#008751]/10 text-[#008751] text-[10px] font-bold px-3 py-1 rounded-bl-xl">
-                                    {bookingStation.companyName}
+                            {/* En-tête Modal */}
+                            <div className="bg-[#008751] px-6 py-5 text-white relative shrink-0">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                                        <Bus size={20} className="text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-black uppercase tracking-wide">Réservation</h3>
+                                        <p className="text-green-100 text-xs font-medium opacity-90">Veuillez compléter vos informations</p>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-4 text-gray-900 font-black text-xl mb-1">
-                                    {bookingStation.pointA} 
-                                    <ArrowRight size={20} className="text-gray-400" /> 
-                                    {bookingStation.pointB}
-                                </div>
-                                <div className="flex gap-2 mt-2">
-                                    {bookingStation.workDays?.map(day => (
-                                        <span key={day} className="text-[10px] bg-white border border-gray-200 text-gray-600 px-2 py-0.5 rounded-md font-bold uppercase">{day.substring(0, 3)}</span>
-                                    ))}
-                                </div>
+                                <button
+                                    onClick={() => setBookingStation(null)}
+                                    className="absolute top-5 right-5 text-white/80 hover:text-white hover:bg-white/20 p-2 rounded-full transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
                             </div>
 
-                            <form onSubmit={handleBook} className="space-y-6">
-                                {/* Info Passager */}
-                                <div className="space-y-4">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                                        <UserIcon size={14} /> Informations Passager
-                                    </h4>
-                                    <div className="space-y-3">
-                                        <input type="text" required className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all" value={bookingForm.name} onChange={e => setBookingForm({ ...bookingForm, name: e.target.value })} placeholder="Nom complet" />
+                            {/* Corps Modal */}
+                            <div className="overflow-y-auto p-6 space-y-6">
+                                {/* Carte Info Trajet */}
+                                <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 bg-[#008751]/10 text-[#008751] text-[10px] font-bold px-3 py-1 rounded-bl-xl">
+                                        {bookingStation.companyName}
+                                    </div>
+                                    <div className="flex items-center gap-4 text-gray-900 font-black text-xl mb-1">
+                                        {bookingStation.pointA}
+                                        <ArrowRight size={20} className="text-gray-400" />
+                                        {bookingStation.pointB}
+                                    </div>
+                                    <div className="flex gap-2 mt-2">
+                                        {bookingStation.workDays?.map(day => (
+                                            <span key={day} className="text-[10px] bg-white border border-gray-200 text-gray-600 px-2 py-0.5 rounded-md font-bold uppercase">{day.substring(0, 3)}</span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <form onSubmit={handleBook} className="space-y-6">
+                                    {/* Info Passager */}
+                                    <div className="space-y-4">
+                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                            <UserIcon size={14} /> Informations Passager
+                                        </h4>
+                                        <div className="space-y-3">
+                                            <input type="text" required className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all" value={bookingForm.name} onChange={e => setBookingForm({ ...bookingForm, name: e.target.value })} placeholder="Nom complet" />
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <input type="tel" required className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all" value={bookingForm.phone} onChange={e => setBookingForm({ ...bookingForm, phone: e.target.value })} placeholder="Téléphone" />
+                                                <input type="email" required className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all" value={bookingForm.email} onChange={e => setBookingForm({ ...bookingForm, email: e.target.value })} placeholder="Email" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Date & Heure */}
+                                    <div className="space-y-4">
+                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                            <Calendar size={14} /> Date et Heure
+                                        </h4>
                                         <div className="grid grid-cols-2 gap-3">
-                                            <input type="tel" required className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all" value={bookingForm.phone} onChange={e => setBookingForm({ ...bookingForm, phone: e.target.value })} placeholder="Téléphone" />
-                                            <input type="email" required className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all" value={bookingForm.email} onChange={e => setBookingForm({ ...bookingForm, email: e.target.value })} placeholder="Email" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Date & Heure */}
-                                <div className="space-y-4">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                                        <Calendar size={14} /> Date et Heure
-                                    </h4>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="relative">
-                                            <input 
-                                                type="date" 
-                                                required 
-                                                min={new Date().toISOString().split('T')[0]} 
-                                                className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all appearance-none" 
-                                                value={bookingForm.date} 
-                                                onChange={handleDateChange} 
-                                            />
-                                        </div>
-                                        <div className="relative">
-                                            <select 
-                                                required 
-                                                className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all appearance-none" 
-                                                value={bookingForm.timeIndex} 
-                                                onChange={e => setBookingForm({ ...bookingForm, timeIndex: e.target.value })} 
-                                                disabled={!bookingForm.date}
-                                            >
-                                                <option value="">Heure...</option>
-                                                {bookingStation.departureHours.map((h, idx) => (
-                                                    <option key={idx} value={idx}>{h}</option>
-                                                ))}
-                                            </select>
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                                                <Clock size={16} />
+                                            <div className="relative">
+                                                <input
+                                                    type="date"
+                                                    required
+                                                    min={new Date().toISOString().split('T')[0]}
+                                                    className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all appearance-none"
+                                                    value={bookingForm.date}
+                                                    onChange={handleDateChange}
+                                                />
+                                            </div>
+                                            <div className="relative">
+                                                <select
+                                                    required
+                                                    className="w-full rounded-2xl border-gray-200 bg-gray-50 border p-4 text-base font-semibold focus:border-[#008751] focus:ring-2 focus:ring-[#008751]/20 outline-none transition-all appearance-none"
+                                                    value={bookingForm.timeIndex}
+                                                    onChange={e => setBookingForm({ ...bookingForm, timeIndex: e.target.value })}
+                                                    disabled={!bookingForm.date}
+                                                >
+                                                    <option value="">Heure...</option>
+                                                    {bookingStation.departureHours.map((h, idx) => (
+                                                        <option key={idx} value={idx}>{h}</option>
+                                                    ))}
+                                                </select>
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                    <Clock size={16} />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Classe Billet */}
-                                <div className="space-y-4">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                                        <CreditCard size={14} /> Type de Billet
-                                    </h4>
-                                    <div className="grid grid-cols-1 gap-3">
-                                        <label className={`relative flex items-center justify-between border-2 rounded-2xl p-4 cursor-pointer transition-all ${bookingForm.ticketClass === 'STANDARD' ? 'border-[#008751] bg-green-50/50' : 'border-gray-100 hover:border-gray-200 bg-white'}`}>
-                                            <div className="flex items-center gap-4">
-                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${bookingForm.ticketClass === 'STANDARD' ? 'border-[#008751]' : 'border-gray-300'}`}>
-                                                    {bookingForm.ticketClass === 'STANDARD' && <div className="w-2.5 h-2.5 bg-[#008751] rounded-full" />}
+                                    {/* Classe Billet */}
+                                    <div className="space-y-4">
+                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                            <CreditCard size={14} /> Type de Billet
+                                        </h4>
+                                        <div className="grid grid-cols-1 gap-3">
+                                            <label className={`relative flex items-center justify-between border-2 rounded-2xl p-4 cursor-pointer transition-all ${bookingForm.ticketClass === 'STANDARD' ? 'border-[#008751] bg-green-50/50' : 'border-gray-100 hover:border-gray-200 bg-white'}`}>
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${bookingForm.ticketClass === 'STANDARD' ? 'border-[#008751]' : 'border-gray-300'}`}>
+                                                        {bookingForm.ticketClass === 'STANDARD' && <div className="w-2.5 h-2.5 bg-[#008751] rounded-full" />}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-bold text-gray-900 block">Standard</span>
+                                                        <span className="text-xs text-gray-500 font-medium">1 bagage inclus • Place standard</span>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <span className="font-bold text-gray-900 block">Standard</span>
-                                                    <span className="text-xs text-gray-500 font-medium">1 bagage inclus • Place standard</span>
-                                                </div>
-                                            </div>
-                                            <span className="font-black text-lg text-gray-900">{bookingStation.price.toLocaleString()} F</span>
-                                            <input type="radio" name="class" value="STANDARD" className="hidden" checked={bookingForm.ticketClass === 'STANDARD'} onChange={() => setBookingForm({ ...bookingForm, ticketClass: 'STANDARD' })} />
-                                        </label>
+                                                <span className="font-black text-lg text-gray-900">{bookingStation.price.toLocaleString()} F</span>
+                                                <input type="radio" name="class" value="STANDARD" className="hidden" checked={bookingForm.ticketClass === 'STANDARD'} onChange={() => setBookingForm({ ...bookingForm, ticketClass: 'STANDARD' })} />
+                                            </label>
 
-                                        <label className={`relative flex items-center justify-between border-2 rounded-2xl p-4 cursor-pointer transition-all ${bookingForm.ticketClass === 'PREMIUM' ? 'border-yellow-400 bg-yellow-50/50' : 'border-gray-100 hover:border-gray-200 bg-white'}`}>
-                                            <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-2 py-0.5 rounded-bl-lg">POPULAIRE</div>
-                                            <div className="flex items-center gap-4">
-                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${bookingForm.ticketClass === 'PREMIUM' ? 'border-yellow-500' : 'border-gray-300'}`}>
-                                                    {bookingForm.ticketClass === 'PREMIUM' && <div className="w-2.5 h-2.5 bg-yellow-500 rounded-full" />}
+                                            <label className={`relative flex items-center justify-between border-2 rounded-2xl p-4 cursor-pointer transition-all ${bookingForm.ticketClass === 'PREMIUM' ? 'border-yellow-400 bg-yellow-50/50' : 'border-gray-100 hover:border-gray-200 bg-white'}`}>
+                                                <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-2 py-0.5 rounded-bl-lg">POPULAIRE</div>
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${bookingForm.ticketClass === 'PREMIUM' ? 'border-yellow-500' : 'border-gray-300'}`}>
+                                                        {bookingForm.ticketClass === 'PREMIUM' && <div className="w-2.5 h-2.5 bg-yellow-500 rounded-full" />}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-bold text-gray-900 block">Premium</span>
+                                                        <span className="text-xs text-gray-500 font-medium">Confort + • Snack inclus • Prioritaire</span>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <span className="font-bold text-gray-900 block">Premium</span>
-                                                    <span className="text-xs text-gray-500 font-medium">Confort + • Snack inclus • Prioritaire</span>
-                                                </div>
-                                            </div>
-                                            <span className="font-black text-lg text-gray-900">{(bookingStation.pricePremium || bookingStation.price * 1.5).toLocaleString()} F</span>
-                                            <input type="radio" name="class" value="PREMIUM" className="hidden" checked={bookingForm.ticketClass === 'PREMIUM'} onChange={() => setBookingForm({ ...bookingForm, ticketClass: 'PREMIUM' })} />
-                                        </label>
+                                                <span className="font-black text-lg text-gray-900">{(bookingStation.pricePremium || bookingStation.price * 1.5).toLocaleString()} F</span>
+                                                <input type="radio" name="class" value="PREMIUM" className="hidden" checked={bookingForm.ticketClass === 'PREMIUM'} onChange={() => setBookingForm({ ...bookingForm, ticketClass: 'PREMIUM' })} />
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="pt-4 pb-2">
-                                    <button 
-                                        type="submit" 
-                                        className="w-full py-4 rounded-2xl bg-[#008751] text-white font-bold text-lg hover:bg-[#006b40] shadow-xl shadow-green-200 hover:shadow-green-300 flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]"
-                                    >
-                                        <span>Payer</span>
-                                        <span className="bg-white/20 px-2 py-0.5 rounded text-sm">
-                                            {bookingForm.ticketClass === 'PREMIUM' ? (bookingStation.pricePremium || bookingStation.price * 1.5).toLocaleString() : bookingStation.price.toLocaleString()} FCFA
-                                        </span>
-                                        <ArrowRight size={20} />
-                                    </button>
-                                </div>
-                            </form>
+                                    <div className="pt-4 pb-2">
+                                        <button
+                                            type="submit"
+                                            className="w-full py-4 rounded-2xl bg-[#008751] text-white font-bold text-lg hover:bg-[#006b40] shadow-xl shadow-green-200 hover:shadow-green-300 flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]"
+                                        >
+                                            <span>Réserver</span>
+                                            <span className="bg-white/20 px-2 py-0.5 rounded text-sm">
+                                                {bookingForm.ticketClass === 'PREMIUM' ? (bookingStation.pricePremium || bookingStation.price * 1.5).toLocaleString() : bookingStation.price.toLocaleString()} FCFA
+                                            </span>
+                                            <ArrowRight size={20} />
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Modal du ticket */}
             {viewingTicket && renderTicketModal()}
-            
+
             <style>{`
                 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
                 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
@@ -961,6 +866,6 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                 .animate-slide-up-mobile { animation: slide-up-mobile 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
                 .animate-scale-up { animation: scale-up 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
             `}</style>
-        </div>
+        </div >
     );
 };

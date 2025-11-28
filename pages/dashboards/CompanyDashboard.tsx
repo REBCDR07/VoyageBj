@@ -1,14 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { User, Station, Reservation } from '../../types';
-import { getStations, deleteStation, getReservations, saveUser, getUsers } from '../../services/storage';
+import { getStations, deleteStation, getReservations, saveUser, getUsers, updateReservation } from '../../services/storage';
 import {
   Plus, MapPin, Trash2, Edit, Users,
   TrendingUp, FileText, X, ArrowRight, Save, Camera, FileJson,
-  MessageCircle, Phone, Mail, HelpCircle, Image as ImageIcon, Bus
+  MessageCircle, Phone, Mail, HelpCircle, Image as ImageIcon, Bus,
+  Download, LayoutDashboard, Edit2, ChevronRight, Clock, Calendar, DollarSign, Search, Filter
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { jsPDF } from "jspdf";
+import { BottomNav } from '../../components/BottomNav';
 import { NotifyFunc } from '../../App';
 
 interface Props {
@@ -30,12 +31,12 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
   const [profileForm, setProfileForm] = useState<Partial<User>>({});
 
   const [showAdminContact, setShowAdminContact] = useState(false);
-  const [adminInfo, setAdminInfo] = useState<User | null>(null);
+  // const [adminInfo, setAdminInfo] = useState<User | null>(null); // No longer needed as modal is hardcoded
 
   useEffect(() => {
     refreshData();
-    const admin = getUsers().find(u => u.role === 'ADMIN');
-    setAdminInfo(admin || null);
+    // const admin = getUsers().find(u => u.role === 'ADMIN'); // No longer needed as modal is hardcoded
+    // setAdminInfo(admin || null); // No longer needed as modal is hardcoded
   }, [user.id]);
 
   useEffect(() => {
@@ -109,30 +110,45 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
     }
   };
 
-  const exportReservationsPDF = (stationId: string) => {
-    const station = stations.find(s => s.id === stationId);
-    const stationRes = reservations.filter(r => r.stationId === stationId);
+  const exportReservationsPDF = (stationId?: string) => {
+    let resToExport = reservations;
+    let title = "Liste des passagers - Toutes les réservations";
+    if (stationId) {
+      const station = stations.find(s => s.id === stationId);
+      resToExport = reservations.filter(r => r.stationId === stationId);
+      title = `Liste des passagers - ${station?.name} `;
+    }
+
     const doc = new jsPDF();
     doc.setFontSize(18);
-    doc.text(`Liste des passagers - ${station?.name}`, 14, 22);
-    doc.setFontSize(12);
-    doc.text(`Trajet: ${station?.pointA} -> ${station?.pointB}`, 14, 32);
-    let y = 50;
-    stationRes.forEach((res, index) => {
-      doc.text(`${index + 1}. ${res.clientName} - ${res.clientPhone} - ${res.departureDate}`, 14, y);
+    doc.text(title, 14, 22);
+    let y = 30;
+    resToExport.forEach((res, index) => {
+      const station = stations.find(s => s.id === res.stationId);
+      doc.text(`${index + 1}. ${res.clientName} - ${res.clientPhone} - ${station?.pointA} -> ${station?.pointB} - ${res.departureDate} - ${res.pricePaid} F`, 14, y);
       y += 10;
+      if (y > 280) { // Check for page overflow
+        doc.addPage();
+        y = 10;
+      }
     });
-    doc.save(`reservations_${station?.name}.pdf`);
+    doc.save(`reservations_${stationId ? stations.find(s => s.id === stationId)?.name : 'all'}.pdf`);
     notify("Export PDF téléchargé", "success");
   };
 
-  const exportReservationsJSON = (stationId: string) => {
-    const station = stations.find(s => s.id === stationId);
-    const stationRes = reservations.filter(r => r.stationId === stationId);
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(stationRes, null, 2));
+  const exportReservationsJSON = (stationId?: string) => {
+    let resToExport = reservations;
+    let filename = `reservations_all.json`;
+    if (stationId) {
+      const station = stations.find(s => s.id === stationId);
+      resToExport = reservations.filter(r => r.stationId === stationId);
+      filename = `reservations_${station?.name}.json`;
+    }
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(resToExport, null, 2));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `reservations_${station?.name}.json`);
+    downloadAnchorNode.setAttribute("download", filename);
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
@@ -276,6 +292,25 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
     </div>
   );
 
+  const handleMarkAsPaid = (reservationId: string) => {
+    const allReservations = getReservations();
+    const reservation = allReservations.find(r => r.id === reservationId);
+    
+    if (!reservation) {
+      notify("Réservation introuvable", "error");
+      return;
+    }
+
+    try {
+      const updatedReservation = { ...reservation, status: 'COMPLETED' as const };
+      updateReservation(updatedReservation);
+      notify("Réservation marquée comme terminée (Payé & Arrivé).", "success");
+      refreshData();
+    } catch (err: any) {
+      notify(err.message || "Erreur lors de la mise à jour", "error");
+    }
+  };
+
   const renderReservations = () => {
     let filteredRes = viewingReservationId ? reservations.filter(r => r.stationId === viewingReservationId) : reservations;
 
@@ -287,9 +322,9 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
     const currentStation = viewingReservationId ? stations.find(s => s.id === viewingReservationId) : null;
 
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-fade-in">
-        <div className="p-6 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div><h2 className="text-xl font-bold text-gray-800">{currentStation ? `Liste des passagers : ${currentStation.name}` : 'Toutes les Réservations'}</h2></div>
+      <div className="animate-fade-in space-y-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div><h2 className="text-2xl font-bold text-gray-800">{currentStation ? `Liste des passagers: ${currentStation.name}` : 'Toutes les Réservations'}</h2><p className="text-gray-500">Gérez les réservations de vos passagers.</p></div>
           <div className="flex flex-col md:flex-row gap-2 items-center">
             <input
               type="date"
@@ -297,82 +332,72 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
             />
-            {viewingReservationId && (
-              <>
-                <button onClick={() => exportReservationsPDF(viewingReservationId)} className="flex items-center gap-2 px-4 py-2 bg-[#e8112d] text-white rounded-lg hover:bg-red-700 text-sm font-medium shadow-sm"><FileText size={16} /> PDF</button>
-                <button onClick={() => exportReservationsJSON(viewingReservationId)} className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 text-sm font-medium shadow-sm"><FileJson size={16} /> JSON</button>
-              </>
-            )}
-            <button onClick={() => { setViewingReservationId(null); setFilterDate(''); }} className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium"><X size={16} /> {viewingReservationId ? 'Voir tout' : 'Reset'}</button>
+            <button onClick={() => exportReservationsPDF(viewingReservationId || undefined)} className="flex items-center gap-2 px-4 py-2 bg-[#e8112d] text-white rounded-lg hover:bg-red-700 text-sm font-medium shadow-sm"><FileText size={16} /> PDF</button>
+            <button onClick={() => exportReservationsJSON(viewingReservationId || undefined)} className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 text-sm font-medium shadow-sm"><FileJson size={16} /> JSON</button>
+            <button onClick={() => { setViewingReservationId(null); setFilterDate(''); }} className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium"><X size={16} /> {viewingReservationId || filterDate ? 'Réinitialiser' : 'Filtres'}</button>
           </div>
         </div>
-        <div className="p-6">
-          {filteredRes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredRes.map(res => {
-                const station = stations.find(s => s.id === res.stationId);
-                return (
-                  <div key={res.id} className="relative bg-gradient-to-br from-white to-gray-50 rounded-xl border-2 border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                    {/* Benin colors stripe */}
-                    <div className="absolute top-0 left-0 right-0 h-2 benin-gradient-bg"></div>
-                    
-                    <div className="p-5 pt-6">
-                      {/* Route info */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-10 h-10 rounded-full bg-[#008751] text-white flex items-center justify-center font-bold text-sm">
-                            {res.clientName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-900 text-sm">{res.clientName}</p>
-                            <p className="text-xs text-gray-500">{res.clientPhone}</p>
-                          </div>
-                        </div>
-                        <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-green-100 text-[#008751] border border-green-200">
-                          {res.ticketClass || 'STANDARD'}
-                        </span>
-                      </div>
 
-                      {/* Trip details */}
-                      <div className="bg-gray-100 rounded-lg p-3 mb-3">
-                        <div className="flex items-center justify-between text-xs mb-2">
-                          <span className="text-gray-500 font-medium">Trajet</span>
-                          <span className="font-bold text-gray-700">{station?.name || 'N/A'}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
-                          <span>{station?.pointA || 'N/A'}</span>
-                          <ArrowRight size={14} className="text-[#FCD116]" />
-                          <span>{station?.pointB || 'N/A'}</span>
-                        </div>
-                      </div>
-
-                      {/* Date & Time */}
-                      <div className="grid grid-cols-2 gap-2 mb-3">
-                        <div className="bg-white rounded-lg p-2 border border-gray-200">
-                          <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Date</p>
-                          <p className="text-xs font-bold text-gray-900">{res.departureDate}</p>
-                        </div>
-                        <div className="bg-white rounded-lg p-2 border border-gray-200">
-                          <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Heure</p>
-                          <p className="text-xs font-bold text-[#008751]">{res.departureTime}</p>
-                        </div>
-                      </div>
-
-                      {/* Price */}
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                        <span className="text-xs text-gray-500 font-medium">Montant payé</span>
-                        <span className="text-lg font-bold text-[#008751]">{res.pricePaid} F</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-gray-400">
-              <p className="text-lg font-medium">Aucune réservation trouvée{filterDate ? " pour cette date" : ""}.</p>
-            </div>
-          )}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="p-4 text-xs font-bold text-gray-400 uppercase">Passager</th>
+                  <th className="p-4 text-xs font-bold text-gray-400 uppercase">Trajet</th>
+                  <th className="p-4 text-xs font-bold text-gray-400 uppercase">Date</th>
+                  <th className="p-4 text-xs font-bold text-gray-400 uppercase">Classe</th>
+                  <th className="p-4 text-xs font-bold text-gray-400 uppercase">Statut</th>
+                  <th className="p-4 text-xs font-bold text-gray-400 uppercase">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredRes.length > 0 ? (
+                  filteredRes.map(res => {
+                    const station = stations.find(s => s.id === res.stationId);
+                    const routeSummary = station ? `${station.pointA} → ${station.pointB}` : 'N/A';
+                    return (
+                      <tr key={res.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="p-4">
+                          <p className="font-bold text-gray-900">{res.clientName}</p>
+                          <p className="text-xs text-gray-500">{res.clientPhone}</p>
+                        </td>
+                        <td className="p-4 font-medium text-gray-700">{routeSummary}</td>
+                        <td className="p-4 text-gray-600">{res.departureDate} <span className="text-xs text-gray-400 block">{res.departureTime}</span></td>
+                        <td className="p-4">
+                          <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${res.ticketClass === 'PREMIUM' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'}`}>
+                            {res.ticketClass}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${res.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
+                              res.status === 'CONFIRMED' ? 'bg-blue-100 text-blue-700' :
+                                'bg-yellow-100 text-yellow-700'
+                            }`}>
+                            {res.status === 'COMPLETED' ? 'Payé & Arrivé' : (res.status === 'CONFIRMED' ? 'Confirmé' : 'En Attente')}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          {res.status !== 'COMPLETED' && (
+                            <button
+                              onClick={() => handleMarkAsPaid(res.id)}
+                              className="px-3 py-1.5 bg-[#008751] text-white text-xs font-bold rounded-lg hover:bg-[#006b40] transition-colors shadow-sm"
+                            >
+                              Arrivé → Payé
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-gray-500">Aucune réservation trouvée{filterDate ? " pour cette date" : ""}.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     );
@@ -382,16 +407,7 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
     <div className="min-h-screen bg-gray-100 p-4 md:p-8 font-sans pb-20">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 sticky top-[70px] z-30 transition-all">
-          <div className="flex overflow-x-auto space-x-2 bg-white p-1.5 rounded-xl shadow-sm border border-gray-200">
-            {[
-              { id: 'overview', label: 'Tableau de bord', icon: <TrendingUp size={18} /> },
-              { id: 'profile', label: 'Mon Profil', icon: <Users size={18} /> },
-              { id: 'stations', label: 'Stations & Parcours', icon: <MapPin size={18} /> },
-              { id: 'reservations', label: 'Réservations', icon: <FileText size={18} /> },
-            ].map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-gray-900 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}>{tab.icon} {tab.label}</button>
-            ))}
-          </div>
+          <h1 className="text-2xl font-bold text-gray-900">Tableau de Bord</h1>
           <button onClick={() => setShowAdminContact(true)} className="flex items-center gap-2 px-5 py-3 bg-white text-[#e8112d] rounded-xl shadow-sm hover:shadow-md font-bold border border-red-100 hover:bg-red-50 transition-colors whitespace-nowrap">
             <HelpCircle size={18} /> Contacter Admin
           </button>
@@ -403,32 +419,54 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
         {activeTab === 'reservations' && renderReservations()}
       </div>
 
+      {/* Modal Contact Admin */}
       {showAdminContact && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10001] p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
-            <button onClick={() => setShowAdminContact(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100"><X size={24} /></button>
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-[#e8112d]"><HelpCircle size={32} /></div>
-              <h3 className="text-2xl font-bold text-gray-900">Support Administrateur</h3>
-              <p className="text-gray-500 mt-1">Besoin d'aide ou d'assistance ? Contactez l'administration directement.</p>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-scale-up">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h3 className="font-bold text-xl text-gray-800">Contacter l'Administrateur</h3>
+              <button onClick={() => setShowAdminContact(false)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                <X size={20} className="text-gray-500" />
+              </button>
             </div>
-            {adminInfo ? (
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                  <p className="text-xs font-bold text-gray-400 uppercase mb-1">Administrateur</p>
-                  <p className="font-bold text-gray-800 text-lg">{adminInfo.name}</p>
-                  <div className="flex items-center gap-2 text-gray-500 mt-1 text-sm"><MapPin size={14} /> {adminInfo.address || 'Adresse non renseignée'}</div>
+            <div className="p-6 space-y-6">
+              <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 shrink-0">
+                  <Phone size={24} />
                 </div>
-                <div className="grid grid-cols-1 gap-3">
-                  {adminInfo.whatsapp && (<a href={`https://wa.me/${adminInfo.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 py-3 bg-[#008751] text-white rounded-xl font-bold hover:bg-[#006b40] transition-colors shadow-lg shadow-green-200"><MessageCircle size={20} /> WhatsApp</a>)}
-                  <a href={`mailto:${adminInfo.email}`} className="flex items-center justify-center gap-3 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors shadow-lg shadow-gray-300"><Mail size={20} /> Email</a>
-                  {adminInfo.phone && (<a href={`tel:${adminInfo.phone}`} className="flex items-center justify-center gap-3 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors"><Phone size={20} /> Appeler</a>)}
+                <div>
+                  <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Téléphone</p>
+                  <a href="tel:+22901020304" className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">+229 01 02 03 04</a>
                 </div>
               </div>
-            ) : <div className="text-center p-4 bg-red-50 text-red-700 rounded-xl">Impossible de trouver les informations de l'administrateur.</div>}
+
+              <div className="flex items-center gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 shrink-0">
+                  <Mail size={24} />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Email</p>
+                  <a href="mailto:admin@voyagebj.com" className="text-lg font-bold text-gray-900 hover:text-green-600 transition-colors">admin@voyagebj.com</a>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl border border-purple-100">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
+                  <MessageCircle size={24} />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">WhatsApp</p>
+                  <a href="https://wa.me/22901020304" target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-gray-900 hover:text-purple-600 transition-colors">Discuter sur WhatsApp</a>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 bg-gray-50 border-t border-gray-100 text-center">
+              <p className="text-xs text-gray-400">L'équipe support est disponible 24/7.</p>
+            </div>
           </div>
         </div>
       )}
+      <BottomNav user={user} activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };
