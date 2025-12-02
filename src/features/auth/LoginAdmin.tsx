@@ -1,12 +1,13 @@
+
 import React, { useState } from 'react';
-import { UserRole, User } from '../../types';
-import { setCurrentUser } from '../../services/storage';
-import { ShieldCheck, User as UserIcon, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { User, ViewState, UserRole } from '../../shared/types';
+import { getUsers, saveUser, setCurrentUser } from '../../shared/services/storage';
+import { Eye, EyeOff, Shield, Lock, ArrowRight, ShieldCheck, User as UserIcon, ArrowLeft } from 'lucide-react';
 
 interface Props {
-    onNavigate: (view: string) => void;
+    onNavigate: (view: ViewState, params?: any) => void;
     notify: (msg: string, type: 'success' | 'error' | 'info') => void;
-    setUser: (user: any) => void;
+    setUser: (user: User) => void;
 }
 
 export const LoginAdmin: React.FC<Props> = ({ onNavigate, notify, setUser }) => {

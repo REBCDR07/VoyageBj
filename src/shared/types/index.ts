@@ -5,15 +5,15 @@ export enum UserRole {
   ADMIN = 'ADMIN'
 }
 
-export type ViewState = 'LANDING' | 'LOGIN_VOYAGEUR' | 'SIGNUP_VOYAGEUR' | 'LOGIN_COMPANY' | 'SIGNUP_COMPANY' | 'LOGIN_ADMIN' | 'DASHBOARD_ADMIN' | 'DASHBOARD_COMPANY' | 'DASHBOARD_CLIENT' | 'STATION_MANAGER' | 'ADMIN_VALIDATIONS' | 'ADMIN_PROFILE' | 'SEARCH_RESULTS' | 'COMPANIES';
+export type ViewState = 'LANDING' | 'LOGIN_VOYAGEUR' | 'SIGNUP_VOYAGEUR' | 'LOGIN_COMPANY' | 'SIGNUP_COMPANY' | 'LOGIN_ADMIN' | 'DASHBOARD_ADMIN' | 'DASHBOARD_COMPANY' | 'DASHBOARD_CLIENT' | 'STATION_MANAGER' | 'ADMIN_VALIDATIONS' | 'ADMIN_PROFILE' | 'SEARCH_RESULTS' | 'COMPANIES_LIST' | 'COMPANY_DETAILS' | 'COMPANIES';
 export type CompanyStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface User {
-  description: string;
   id: string;
-  name: string; // Manager name for company, Full name for client
   email: string;
-  role: UserRole;
+  password?: string; // Added password as optional
+  name: string; // Manager name for company, Full name for client
+  role: UserRole; // Kept UserRole enum
   avatarUrl?: string;
   npi?: string; // Numéro Personnel d'Identification
 
@@ -32,29 +32,36 @@ export interface User {
   // Informations de contact admin
   address?: string;
   whatsapp?: string;
+  description?: string;
 }
 
 export interface Station {
   id: string;
+  parentId?: string; // ID of the parent station (if this is a route)
   companyId: string;
   companyName: string;
   type: 'STATION' | 'ROUTE'; // Sub-station or direct route
   name: string;
   photoUrl: string;
   location: string; // City/Area
+  mapLink?: string; // Google Maps link
   description?: string;
 
-  // Détails du trajet
-  pointA: string;
-  pointB: string;
-  departurePoint: string; // Specific spot
+  // Horaires d'ouverture (Pour Station)
+  openingTime?: string;
+  closingTime?: string;
+
+  // Détails du trajet (Pour Route)
+  pointA?: string;
+  pointB?: string;
+  departurePoint?: string; // Specific spot
 
   // Horaires
   workDays: string[]; // ["Mon", "Tue", ...]
-  departureHours: string[]; // ["08:00", "14:00"]
-  arrivalHours?: string[]; // ["12:00", "18:00"]
+  departureHours?: string[]; // ["08:00", "14:00"] (Pour Route)
+  arrivalHours?: string[]; // ["12:00", "18:00"] (Pour Route)
 
-  price: number;
+  price?: number;
   pricePremium?: number;
 }
 

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Station, Reservation } from '../../types';
-import { getStations, getReservations, createReservation, getUsers, saveUser } from '../../services/storage';
+import { User, Station, Reservation, ViewState } from '../../shared/types';
+import { getStations, getReservations, createReservation, getUsers, saveUser } from '../../shared/services/storage';
 import {
     MapPin, Search, Calendar, Clock, User as UserIcon, Settings, LogOut,
     ChevronRight, Star, Shield, Bus, ArrowRight, X, CreditCard, CheckCircle, FileText, Download, Ticket as TicketIcon,
@@ -12,15 +12,16 @@ import { NotifyFunc } from '../../App';
 import html2canvas from 'html2canvas';
 // @ts-ignore
 import { jsPDF } from 'jspdf';
-import { BottomNav } from '../../components/BottomNav';
-import { Ticket } from '../../components/Ticket';
+import { BottomNav } from '../../shared/components/BottomNav';
+import { Ticket } from '../../shared/components/Ticket';
 
 interface Props {
     user: User;
     notify: NotifyFunc;
+    onNavigate: (view: ViewState, params?: any) => void;
 }
 
-export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
+export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) => {
     const [view, setView] = useState<'dashboard' | 'browse' | 'company_profile' | 'profile' | 'tickets'>('dashboard');
     const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
     const [allStations, setAllStations] = useState<Station[]>([]);
@@ -77,9 +78,10 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
         if (!bookingStation || !bookingForm.timeIndex) return;
 
         const timeIdx = parseInt(bookingForm.timeIndex);
-        const depTime = bookingStation.departureHours[timeIdx];
+        const depTime = bookingStation.departureHours?.[timeIdx] || '00:00';
 
-        const price = bookingForm.ticketClass === 'PREMIUM' ? (bookingStation.pricePremium || bookingStation.price * 1.5) : bookingStation.price;
+        const basePrice = bookingStation.price || 0;
+        const price = bookingForm.ticketClass === 'PREMIUM' ? (bookingStation.pricePremium || basePrice * 1.5) : basePrice;
 
         const reservation: Reservation = {
             id: crypto.randomUUID(),
@@ -531,7 +533,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                                 </p>
                                             </div>
                                             <div className="bg-green-50 px-4 py-2 rounded-xl text-right border border-green-100 self-start">
-                                                <span className="block font-black text-2xl text-[#008751]">{station.price.toLocaleString()} F</span>
+                                                <span className="block font-black text-2xl text-[#008751]">{(station.price || 0).toLocaleString()} F</span>
                                             </div>
                                         </div>
 
@@ -631,7 +633,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
         if (!viewingTicket) return null;
 
         const station = allStations.find(s => s.id === viewingTicket.stationId);
-        const depIndex = station?.departureHours.indexOf(viewingTicket.departureTime) ?? 0;
+        const depIndex = station?.departureHours?.indexOf(viewingTicket.departureTime) ?? 0;
         const arrivalTime = station?.arrivalHours?.[depIndex] || '--:--';
         const company = companies.find(c => c.id === viewingTicket.companyId);
 
@@ -787,7 +789,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                                     disabled={!bookingForm.date}
                                                 >
                                                     <option value="">Heure...</option>
-                                                    {bookingStation.departureHours.map((h, idx) => (
+                                                    {(bookingStation.departureHours || []).map((h, idx) => (
                                                         <option key={idx} value={idx}>{h}</option>
                                                     ))}
                                                 </select>
@@ -814,7 +816,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                                         <span className="text-xs text-gray-500 font-medium">1 bagage inclus • Place standard</span>
                                                     </div>
                                                 </div>
-                                                <span className="font-black text-lg text-gray-900">{bookingStation.price.toLocaleString()} F</span>
+                                                <span className="font-black text-lg text-gray-900">{(bookingStation.price || 0).toLocaleString()} F</span>
                                                 <input type="radio" name="class" value="STANDARD" className="hidden" checked={bookingForm.ticketClass === 'STANDARD'} onChange={() => setBookingForm({ ...bookingForm, ticketClass: 'STANDARD' })} />
                                             </label>
 
@@ -829,7 +831,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                                         <span className="text-xs text-gray-500 font-medium">Confort + • Snack inclus • Prioritaire</span>
                                                     </div>
                                                 </div>
-                                                <span className="font-black text-lg text-gray-900">{(bookingStation.pricePremium || bookingStation.price * 1.5).toLocaleString()} F</span>
+                                                <span className="font-black text-lg text-gray-900">{(bookingStation.pricePremium || (bookingStation.price || 0) * 1.5).toLocaleString()} F</span>
                                                 <input type="radio" name="class" value="PREMIUM" className="hidden" checked={bookingForm.ticketClass === 'PREMIUM'} onChange={() => setBookingForm({ ...bookingForm, ticketClass: 'PREMIUM' })} />
                                             </label>
                                         </div>
@@ -842,7 +844,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify }) => {
                                         >
                                             <span>Réserver</span>
                                             <span className="bg-white/20 px-2 py-0.5 rounded text-sm">
-                                                {bookingForm.ticketClass === 'PREMIUM' ? (bookingStation.pricePremium || bookingStation.price * 1.5).toLocaleString() : bookingStation.price.toLocaleString()} FCFA
+                                                {bookingForm.ticketClass === 'PREMIUM' ? (bookingStation.pricePremium || (bookingStation.price || 0) * 1.5).toLocaleString() : (bookingStation.price || 0).toLocaleString()} FCFA
                                             </span>
                                             <ArrowRight size={20} />
                                         </button>

@@ -1,27 +1,29 @@
+
 import React, { useState, useEffect } from 'react';
-import { User, Station, Reservation } from '../../types';
-import { getStations, deleteStation, getReservations, saveUser, getUsers, updateReservation } from '../../services/storage';
+import { User, Station, Reservation, ViewState } from '../../shared/types';
+import { getStations, deleteStation, getReservations, saveUser, getUsers, updateReservation } from '../../shared/services/storage';
 import {
   Plus, MapPin, Trash2, Edit, Users,
   TrendingUp, FileText, X, ArrowRight, Save, Camera, FileJson,
   MessageCircle, Phone, Mail, HelpCircle, Image as ImageIcon, Bus,
-  Download, LayoutDashboard, Edit2, ChevronRight, Clock, Calendar, DollarSign, Search, Filter
+  Download, LayoutDashboard, Edit2, ChevronRight, Clock, Calendar, DollarSign, Search, Filter, Route as RouteIcon
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { jsPDF } from "jspdf";
-import { BottomNav } from '../../components/BottomNav';
+import { BottomNav } from '../../shared/components/BottomNav';
 import { NotifyFunc } from '../../App';
 
 interface Props {
   user: User;
   notify: NotifyFunc;
-  onNavigate: (view: any) => void;
+  onNavigate: (view: ViewState, params?: any) => void;
   setEditStationId: (id: string | null) => void;
+  setStationManagerProps?: (props: { initialType: 'STATION' | 'ROUTE', parentId?: string }) => void;
 }
 
 const COLORS = ['#008751', '#e9b400', '#e8112d', '#292a2c']; // Benin Green, Yellow, Red, Dark
 
-export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, setEditStationId }) => {
+export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, setEditStationId, setStationManagerProps }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'stations' | 'reservations' | 'profile'>('overview');
   const [stations, setStations] = useState<Station[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -31,19 +33,16 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
   const [profileForm, setProfileForm] = useState<Partial<User>>({});
 
   const [showAdminContact, setShowAdminContact] = useState(false);
-  // const [adminInfo, setAdminInfo] = useState<User | null>(null); // No longer needed as modal is hardcoded
+  const [viewingStationDetailsId, setViewingStationDetailsId] = useState<string | null>(null);
 
   useEffect(() => {
     refreshData();
-    // const admin = getUsers().find(u => u.role === 'ADMIN'); // No longer needed as modal is hardcoded
-    // setAdminInfo(admin || null); // No longer needed as modal is hardcoded
   }, [user.id]);
 
   useEffect(() => {
     if (activeTab === 'profile') {
       setProfileForm(user);
     }
-    // Scroll to top when tab changes
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeTab, user]);
 
@@ -64,12 +63,15 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
 
   const handleEdit = (id: string) => {
     setEditStationId(id);
+    if (setStationManagerProps) setStationManagerProps({ initialType: 'STATION' });
     onNavigate('STATION_MANAGER');
   };
 
-  const handleCreate = (type: 'STATION' | 'ROUTE') => {
+  const handleCreate = (type: 'STATION' | 'ROUTE', parentId?: string) => {
     setEditStationId(null);
-    // You might want to pass the type via a separate state or just default it in the manager
+    if (setStationManagerProps) {
+      setStationManagerProps({ initialType: type, parentId });
+    }
     onNavigate('STATION_MANAGER');
   };
 
@@ -127,7 +129,7 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
       const station = stations.find(s => s.id === res.stationId);
       doc.text(`${index + 1}. ${res.clientName} - ${res.clientPhone} - ${station?.pointA} -> ${station?.pointB} - ${res.departureDate} - ${res.pricePaid} F`, 14, y);
       y += 10;
-      if (y > 280) { // Check for page overflow
+      if (y > 280) {
         doc.addPage();
         y = 10;
       }
@@ -214,20 +216,20 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
-              <div><p className="text-gray-500 text-sm font-medium uppercase tracking-wider">Sous-stations</p><h3 className="text-3xl font-bold text-benin-yellow mt-1">{stations.length}</h3></div>
+              <div><p className="text-gray-500 text-sm font-medium uppercase tracking-wider">Sous-stations</p><h3 className="text-3xl font-bold text-benin-yellow mt-1">{stations.filter(s => s.type === 'STATION').length}</h3></div>
               <div className="p-3 bg-yellow-100 rounded-full text-yellow-700"><MapPin size={24} /></div>
             </div>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
-              <div><p className="text-gray-500 text-sm font-medium uppercase tracking-wider">Remplissage</p><h3 className="text-3xl font-bold text-benin-red mt-1">-- %</h3></div>
-              <div className="p-3 bg-red-100 rounded-full text-red-700"><TrendingUp size={24} /></div>
+              <div><p className="text-gray-500 text-sm font-medium uppercase tracking-wider">Parcours</p><h3 className="text-3xl font-bold text-benin-red mt-1">{stations.filter(s => s.type === 'ROUTE').length}</h3></div>
+              <div className="p-3 bg-red-100 rounded-full text-red-700"><RouteIcon size={24} /></div>
             </div>
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h4 className="text-lg font-bold mb-4 text-gray-800">Trafic par Station</h4>
+            <h4 className="text-lg font-bold mb-4 text-gray-800">Trafic par Station/Trajet</h4>
             <div className="h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={popularRoutes.slice(0, 5)}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" hide /><YAxis /><Tooltip /><Bar dataKey="reservations" fill="#008751" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer></div>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -239,48 +241,99 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
     );
   };
 
-  const renderStations = () => (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <div><h2 className="text-2xl font-bold text-gray-800">Gestion des Stations</h2><p className="text-gray-500">Gérez vos sous-stations et vos parcours directs.</p></div>
-        <div className="flex gap-3">
-          <button onClick={() => handleCreate('STATION')} className="bg-[#008751] text-white px-5 py-2.5 rounded-lg hover:bg-[#006b40] flex items-center gap-2 transition-colors shadow-md font-medium"><Plus size={20} /> Créer Sous-station</button>
-          <button onClick={() => handleCreate('ROUTE')} className="bg-[#e9b400] text-white px-5 py-2.5 rounded-lg hover:bg-yellow-600 flex items-center gap-2 transition-colors shadow-md font-medium"><Plus size={20} /> Créer Parcours</button>
-        </div>
-      </div>
+  const renderStations = () => {
+    const parentStations = stations.filter(s => s.type === 'STATION');
+    const standaloneRoutes = stations.filter(s => s.type === 'ROUTE' && !s.parentId);
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stations.map(station => (
-          <div key={station.id} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 hover:border-green-300 hover:shadow-md transition-all group">
-            <div className="h-48 overflow-hidden relative">
-              <img src={station.photoUrl} alt={station.name} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-              <div className="absolute bottom-3 left-3 text-white w-full pr-4">
-                <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <h3 className="font-bold text-lg leading-tight flex items-center gap-2">
-                    <Bus size={18} className="text-white" />
-                    {station.name}
-                  </h3>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border shadow-sm backdrop-blur-sm ${station.type === 'STATION' ? 'bg-[#008751]/80 border-green-400 text-white' : 'bg-[#e9b400]/80 border-yellow-400 text-white'}`}>
-                    {station.type === 'STATION' ? 'SOUS-STATION' : 'PARCOURS'}
-                  </span>
+    return (
+      <div className="space-y-8 animate-fade-in">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div><h2 className="text-2xl font-bold text-gray-800">Gestion des Stations</h2><p className="text-gray-500">Gérez vos sous-stations et vos parcours.</p></div>
+          <div className="flex gap-3">
+            <button onClick={() => handleCreate('STATION')} className="bg-[#008751] text-white px-5 py-2.5 rounded-lg hover:bg-[#006b40] flex items-center gap-2 transition-colors shadow-md font-medium"><Plus size={20} /> Créer Sous-station</button>
+            <button onClick={() => handleCreate('ROUTE')} className="bg-[#e9b400] text-white px-5 py-2.5 rounded-lg hover:bg-yellow-600 flex items-center gap-2 transition-colors shadow-md font-medium"><Plus size={20} /> Créer Parcours Direct</button>
+          </div>
+        </div>
+
+        {/* --- PARENT STATIONS SECTION --- */}
+        {parentStations.length > 0 && (
+          <div className="space-y-6">
+            <h3 className="text-lg font-bold text-gray-700 border-b pb-2">Vos Sous-Stations</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {parentStations.map(station => (
+                <div key={station.id} onClick={() => setViewingStationDetailsId(station.id)} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 hover:border-green-300 hover:shadow-md transition-all group cursor-pointer">
+                  <div className="h-48 overflow-hidden relative">
+                    <img src={station.photoUrl} alt={station.name} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute bottom-3 left-3 text-white w-full pr-4">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <h3 className="font-bold text-lg leading-tight flex items-center gap-2">
+                          <MapPin size={18} className="text-white" />
+                          {station.name}
+                        </h3>
+                      </div>
+                      <p className="text-sm opacity-90">{station.location}</p>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <div className="flex flex-col gap-2 mb-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Clock size={14} />
+                        <span>{station.openingTime || '--:--'} - {station.closingTime || '--:--'}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {station.workDays.map(d => <span key={d} className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-500">{d.substring(0, 3)}</span>)}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm text-gray-500 mt-4 pt-4 border-t border-gray-100">
+                      <span>{stations.filter(s => s.parentId === station.id).length} Parcours associés</span>
+                      <ChevronRight size={16} />
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm opacity-90">{station.location}</p>
-              </div>
-            </div>
-            <div className="p-5">
-              <div className="bg-gray-50 p-4 rounded-lg mb-4 border border-gray-100">
-                <div className="flex justify-between items-center text-sm mb-2"><span className="text-gray-500 font-medium">Trajet</span><span className="font-bold text-gray-800 flex items-center gap-1">{station.pointA} <ArrowRight size={14} /> {station.pointB}</span></div>
-                <div className="flex justify-between items-center text-sm"><span className="text-gray-500 font-medium">Prix</span><div className="text-right"><span className="font-bold text-benin-green text-lg block">{station.price} F</span>{station.pricePremium && <span className="text-xs font-bold text-yellow-600 block">{station.pricePremium} F (Prem)</span>}</div></div>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={() => handleEdit(station.id)} className="flex-1 bg-white border border-gray-300 text-gray-700 py-2.5 rounded-lg hover:bg-gray-50 flex justify-center items-center gap-2 text-sm font-bold transition-colors"><Edit size={16} /> Modifier</button>
-                <button onClick={() => handleDelete(station.id)} className="w-12 bg-red-50 border border-red-100 text-[#e8112d] rounded-lg hover:bg-red-100 flex justify-center items-center transition-colors" title="Supprimer"><Trash2 size={18} /></button>
-              </div>
-              <button onClick={() => { setViewingReservationId(station.id); setActiveTab('reservations'); }} className="w-full mt-3 bg-green-50 text-[#008751] py-2.5 rounded-lg hover:bg-green-100 text-sm font-bold transition-colors flex items-center justify-center gap-2"><Users size={16} /> Voir les Réservations</button>
+              ))}
             </div>
           </div>
-        ))}
+        )}
+
+        {/* --- STANDALONE ROUTES SECTION --- */}
+        {standaloneRoutes.length > 0 && (
+          <div className="space-y-6">
+            <h3 className="text-lg font-bold text-gray-700 border-b pb-2">Parcours Directs (Indépendants)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {standaloneRoutes.map(station => (
+                <div key={station.id} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all group">
+                  <div className="h-48 overflow-hidden relative">
+                    <img src={station.photoUrl} alt={station.name} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute bottom-3 left-3 text-white w-full pr-4">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <h3 className="font-bold text-lg leading-tight flex items-center gap-2">
+                          <Bus size={18} className="text-white" />
+                          {station.name}
+                        </h3>
+                      </div>
+                      <p className="text-sm opacity-90">{station.location}</p>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <div className="bg-gray-50 p-4 rounded-lg mb-4 border border-gray-100">
+                      <div className="flex justify-between items-center text-sm mb-2"><span className="text-gray-500 font-medium">Trajet</span><span className="font-bold text-gray-800 flex items-center gap-1">{station.pointA} <ArrowRight size={14} /> {station.pointB}</span></div>
+                      <div className="flex justify-between items-center text-sm"><span className="text-gray-500 font-medium">Prix</span><div className="text-right"><span className="font-bold text-benin-green text-lg block">{station.price} F</span>{station.pricePremium && <span className="text-xs font-bold text-yellow-600 block">{station.pricePremium} F (Prem)</span>}</div></div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => handleEdit(station.id)} className="flex-1 bg-white border border-gray-300 text-gray-700 py-2.5 rounded-lg hover:bg-gray-50 flex justify-center items-center gap-2 text-sm font-bold transition-colors"><Edit size={16} /> Modifier</button>
+                      <button onClick={() => handleDelete(station.id)} className="w-12 bg-red-50 border border-red-100 text-[#e8112d] rounded-lg hover:bg-red-100 flex justify-center items-center transition-colors" title="Supprimer"><Trash2 size={18} /></button>
+                    </div>
+                    <button onClick={() => { setViewingReservationId(station.id); setActiveTab('reservations'); }} className="w-full mt-3 bg-green-50 text-[#008751] py-2.5 rounded-lg hover:bg-green-100 text-sm font-bold transition-colors flex items-center justify-center gap-2"><Users size={16} /> Voir les Réservations</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {stations.length === 0 && (
           <div className="col-span-1 md:col-span-3 py-10 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
             <MapPin size={40} className="mb-2 opacity-50" />
@@ -289,13 +342,87 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
           </div>
         )}
       </div>
-    </div>
-  );
+    );
+  };
+
+  const renderStationDetailsModal = () => {
+    if (!viewingStationDetailsId) return null;
+    const station = stations.find(s => s.id === viewingStationDetailsId);
+    if (!station) return null;
+
+    const routes = stations.filter(s => s.parentId === station.id);
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden animate-scale-up flex flex-col max-h-[90vh]">
+          <div className="relative h-48">
+            <img src={station.photoUrl} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 w-full p-6 flex justify-between items-end">
+              <div className="text-white">
+                <h2 className="text-3xl font-bold flex items-center gap-2"><MapPin /> {station.name}</h2>
+                <p className="opacity-90">{station.location}</p>
+              </div>
+              <button onClick={() => setViewingStationDetailsId(null)} className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 overflow-y-auto custom-scrollbar">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gray-800">Parcours Disponibles</h3>
+              <button onClick={() => handleCreate('ROUTE', station.id)} className="bg-[#e9b400] text-white px-4 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-2 font-bold shadow-md transition-colors">
+                <Plus size={18} /> Ajouter Parcours
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {routes.map(route => (
+                <div key={route.id} className="border border-gray-200 rounded-xl p-4 hover:border-yellow-400 transition-colors bg-gray-50">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2 font-bold text-lg text-gray-800">
+                      {route.pointA} <ArrowRight size={16} className="text-gray-400" /> {route.pointB}
+                    </div>
+                    <span className="bg-green-100 text-[#008751] px-2 py-1 rounded text-xs font-bold">{route.price} F</span>
+                  </div>
+                  <div className="text-sm text-gray-500 mb-4 space-y-1">
+                    <p className="flex items-center gap-2"><Calendar size={14} /> {route.workDays.join(', ')}</p>
+                    <p className="flex items-center gap-2"><Clock size={14} /> {route.departureHours?.join(', ')}</p>
+                  </div>
+                  <div className="flex gap-2 pt-3 border-t border-gray-200">
+                    <button onClick={() => handleEdit(route.id)} className="flex-1 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-bold flex items-center justify-center gap-1"><Edit size={14} /> Modifier</button>
+                    <button onClick={() => handleDelete(route.id)} className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 border border-red-100"><Trash2 size={14} /></button>
+                  </div>
+                </div>
+              ))}
+              {routes.length === 0 && (
+                <div className="col-span-2 py-12 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+                  <RouteIcon size={32} className="mx-auto mb-2 opacity-50" />
+                  <p>Aucun parcours configuré pour cette station.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
+            <div className="text-sm text-gray-500">
+              <span className="font-bold text-gray-700">Horaires:</span> {station.openingTime || '--:--'} - {station.closingTime || '--:--'}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => { setViewingStationDetailsId(null); handleEdit(station.id); }} className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg font-medium text-sm transition-colors">Modifier Station</button>
+              <button onClick={() => { setViewingStationDetailsId(null); handleDelete(station.id); }} className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium text-sm transition-colors">Supprimer Station</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const handleMarkAsPaid = (reservationId: string) => {
     const allReservations = getReservations();
     const reservation = allReservations.find(r => r.id === reservationId);
-    
+
     if (!reservation) {
       notify("Réservation introuvable", "error");
       return;
@@ -314,7 +441,6 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
   const renderReservations = () => {
     let filteredRes = viewingReservationId ? reservations.filter(r => r.stationId === viewingReservationId) : reservations;
 
-    // Apply Date Filter
     if (filterDate) {
       filteredRes = filteredRes.filter(r => r.departureDate === filterDate);
     }
@@ -371,8 +497,8 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
                         </td>
                         <td className="p-4">
                           <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${res.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                              res.status === 'CONFIRMED' ? 'bg-blue-100 text-blue-700' :
-                                'bg-yellow-100 text-yellow-700'
+                            res.status === 'CONFIRMED' ? 'bg-blue-100 text-blue-700' :
+                              'bg-yellow-100 text-yellow-700'
                             }`}>
                             {res.status === 'COMPLETED' ? 'Payé & Arrivé' : (res.status === 'CONFIRMED' ? 'Confirmé' : 'En Attente')}
                           </span>
@@ -466,6 +592,10 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
           </div>
         </div>
       )}
+
+      {/* Station Details Modal */}
+      {renderStationDetailsModal()}
+
       <BottomNav user={user} activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );

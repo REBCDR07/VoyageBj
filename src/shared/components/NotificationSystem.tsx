@@ -25,23 +25,47 @@ interface NotificationSystemProps {
   removeNotification: (id: number) => void;
 }
 
-const DISPLAY_DURATION = 3000; // Durée d'affichage en ms (3 secondes)
+const DISPLAY_DURATION = 2000; // Durée d'affichage en ms (2 secondes)
 
 /**
  * Composant principal qui gère la liste des notifications.
- * Positionnement fixe : en haut au centre sur mobile, en bas à droite sur desktop.
+ * Positionnement :
+ * - Success : Au milieu de la page
+ * - Danger : En bas à droite (avec les autres)
  */
 export const NotificationSystem: React.FC<NotificationSystemProps> = ({ notifications, removeNotification }) => {
+  // Séparer les notifications selon leur position
+  const centerNotifications = notifications.filter(n => n.variant === 'success');
+  const cornerNotifications = notifications.filter(n => n.variant !== 'success');
+
+  // Limiter le nombre de notifications affichées pour éviter l'encombrement (max 3 par zone)
+  const visibleCenter = centerNotifications.slice(0, 3);
+  const visibleCorner = cornerNotifications.slice(0, 3);
+
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-0 z-[9999] flex flex-col items-center gap-2 p-4 md:items-end md:top-auto md:bottom-0 md:right-0 md:max-w-sm">
-      {notifications.map((notification) => (
-        <NotificationCard
-          key={notification.id}
-          notification={notification}
-          onRemove={() => removeNotification(notification.id)}
-        />
-      ))}
-    </div>
+    <>
+      {/* Zone Centrale (Success) */}
+      <div className="pointer-events-none fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-2 p-4">
+        {visibleCenter.map((notification) => (
+          <NotificationCard
+            key={notification.id}
+            notification={notification}
+            onRemove={() => removeNotification(notification.id)}
+          />
+        ))}
+      </div>
+
+      {/* Zone Coin Bas-Droit (Danger, Warning, Info, Message) */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-[9999] flex flex-col items-center gap-2 p-4 md:items-end md:top-auto md:bottom-0 md:right-0 md:max-w-sm">
+        {visibleCorner.map((notification) => (
+          <NotificationCard
+            key={notification.id}
+            notification={notification}
+            onRemove={() => removeNotification(notification.id)}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 

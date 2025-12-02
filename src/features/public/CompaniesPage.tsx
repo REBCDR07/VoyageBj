@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { User } from '../types';
-import { getUsers } from '../services/storage';
+import { User } from '../../shared/types';
+import { getUsers } from '../../shared/services/storage';
 import { Building2, MapPin, Phone, Mail, CheckCircle, ArrowRight } from 'lucide-react';
-import { Footer } from '../components/Footer';
+import { Footer } from '../../shared/components/Footer';
+
+import { ViewState } from '../../shared/types';
 
 interface Props {
-    onNavigate: (page: string) => void;
+    onNavigate: (page: ViewState, params?: any) => void;
 }
 
 export const CompaniesPage: React.FC<Props> = ({ onNavigate }) => {
@@ -81,7 +83,7 @@ export const CompaniesPage: React.FC<Props> = ({ onNavigate }) => {
                 )}
             </div>
 
-            <Footer onNavigate={onNavigate} />
+
         </div>
     );
 };

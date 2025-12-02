@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { User, UserRole } from '../../types';
-import { getUsers, saveUser, getStations } from '../../services/storage';
+import { User, UserRole, ViewState } from '../../shared/types';
+import { getUsers, saveUser, getStations } from '../../shared/services/storage';
 import {
     Users, Search, Filter, CheckCircle, XCircle, MoreVertical,
     Shield, AlertCircle, Download, Eye, FileText, X, ExternalLink, User as UserIcon, Building2, Phone, Mail, CreditCard, RefreshCw
 } from 'lucide-react';
 import { NotifyFunc } from '../../App';
-import { DocumentViewerModal } from '../../components/DocumentViewerModal';
-import { CompanyDetailsModal } from '../../components/CompanyDetailsModal';
-import { BottomNav } from '../../components/BottomNav';
+import { DocumentViewerModal } from '../../shared/components/DocumentViewerModal';
+import { CompanyDetailsModal } from '../../shared/components/CompanyDetailsModal';
+import { BottomNav } from '../../shared/components/BottomNav';
 
 interface Props {
     user: User;
     notify: NotifyFunc;
+    onNavigate: (view: ViewState, params?: any) => void;
     initialTab?: 'dashboard' | 'profile';
     initialFilter?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
 }
 
-export const AdminDashboard: React.FC<Props> = ({ user, notify, initialTab = 'dashboard', initialFilter = 'PENDING' }) => {
+export const AdminDashboard: React.FC<Props> = ({ user, notify, onNavigate, initialTab = 'dashboard', initialFilter = 'PENDING' }) => {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'profile'>(initialTab);
     const [companies, setCompanies] = useState<User[]>([]);
     const [filterStatus, setFilterStatus] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>(initialFilter);

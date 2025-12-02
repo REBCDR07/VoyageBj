@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { UserRole, User } from '../../types';
-import { saveUser, setCurrentUser } from '../../services/storage';
+import { UserRole, User, ViewState } from '../../shared/types';
+import { saveUser, setCurrentUser } from '../../shared/services/storage';
 import { Eye, EyeOff, ArrowLeft, Camera, ChevronRight } from 'lucide-react';
-import { compressImage } from '../../utils/imageUtils';
+import { compressImage } from '../../shared/utils/imageUtils';
+import { NotifyFunc } from '../../App';
 
 interface Props {
-    onNavigate: (view: string) => void;
-    notify: (msg: string, type: 'success' | 'error' | 'info') => void;
-    setUser: (user: any) => void;
+    onNavigate: (view: ViewState, params?: any) => void;
+    notify: NotifyFunc;
+    setUser: (user: User) => void;
 }
 
 export const SignupVoyageur: React.FC<Props> = ({ onNavigate, notify, setUser }) => {
@@ -57,14 +58,14 @@ export const SignupVoyageur: React.FC<Props> = ({ onNavigate, notify, setUser })
 
     return (
         <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-amber-50 via-emerald-50 to-red-50">
-            
+
             <div className="bg-white/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-[90%] sm:max-w-md md:max-w-lg shadow-lg z-10 backdrop-blur-sm">
-                    
+
                 <form className="w-full flex flex-col items-center text-center" onSubmit={handleRegister}>
                     {/* Typographie responsive */}
                     <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">Créer un Compte</h2>
                     <p className="text-sm sm:text-base text-gray-700 font-medium mb-4">Commencez votre voyage avec VoyageBj</p>
-                    
+
                     <div className="flex gap-1 mb-6">
                         {[1, 2].map(n => (<div key={n} className={`h-1.5 w-8 rounded-full transition-colors duration-300 ${n <= step ? 'bg-[#008751]' : 'bg-gray-300'}`}></div>))}
                     </div>

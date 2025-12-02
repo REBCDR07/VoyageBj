@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { UserRole } from '../../types';
-import { getUsers, setCurrentUser } from '../../services/storage';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { UserRole, User, ViewState } from '../../shared/types';
+import { getUsers, setCurrentUser } from '../../shared/services/storage';
+import { Eye, EyeOff, ArrowLeft, Briefcase } from 'lucide-react';
+import { NotifyFunc } from '../../App';
 
 interface Props {
-  onNavigate: (view: string) => void;
-  notify: (msg: string, type: 'success'|'error'|'info') => void;
-  setUser: (user: any) => void;
+  onNavigate: (view: ViewState, params?: any) => void;
+  notify: NotifyFunc;
+  setUser: (user: User) => void;
 }
 
 export const LoginCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) => {
@@ -19,11 +20,11 @@ export const LoginCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) =
         const users = getUsers();
         const found = users.find(u => u.email === email && u.role === UserRole.COMPANY);
         if (found) {
-             if (found.status !== 'APPROVED') return notify(`Compte ${found.status === 'PENDING' ? 'en attente' : 'refusé'}.`, 'error');
+             if (found.status !== 'APPROVED') return notify(`Compte ${ found.status === 'PENDING' ? 'en attente' : 'refusé' }.`, 'error');
             setCurrentUser(found); 
             setUser(found); 
             onNavigate('DASHBOARD_COMPANY'); 
-            notify(`Bienvenue ${found.companyName} !`, 'success');
+            notify(`Bienvenue ${ found.companyName } !`, 'success');
         } else notify("Identifiants incorrects.", 'error');
     };
 

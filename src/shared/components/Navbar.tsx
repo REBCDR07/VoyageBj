@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import { Truck, Home, Bell, Menu, LayoutDashboard, LogOut, X, ChevronRight, User as UserIcon, Briefcase, Shield } from 'lucide-react';
-import { User } from '../types';
+import { User, ViewState } from '../types';
 
 interface NavbarProps {
     user: User | null;
-    onNavigate: (view: any) => void;
+    onNavigate: (view: ViewState) => void;
     onLogout: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout }) => {
     const [visitorMenuOpen, setVisitorMenuOpen] = useState(false);
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
     const toggleMenu = () => {
         setVisitorMenuOpen(!visitorMenuOpen);
     };
 
-    const handleNav = (view: string) => {
+    const handleNav = (view: ViewState) => {
         onNavigate(view);
         setVisitorMenuOpen(false);
     };
@@ -62,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout }) =>
                         <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
                             {/* Home Button (Visible on all sizes, refined) */}
                             <button
-                                onClick={() => onNavigate('LANDING')}
+                                onClick={() => onNavigate(user?.role === 'CLIENT' ? 'COMPANIES_LIST' : 'LANDING')}
                                 className="p-2.5 text-gray-400 hover:text-[#008751] hover:bg-gray-50 rounded-xl transition-all active:scale-95 hidden sm:block"
                                 title="Retour à l'accueil"
                             >
@@ -143,7 +144,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout }) =>
                                     </button>
 
                                     <button
-                                        onClick={() => onNavigate('LOGIN_VOYAGEUR')}
+                                        onClick={() => setShowAuthModal(true)}
                                         className="ml-2 bg-[#008751] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-green-200 hover:bg-[#006b40] hover:shadow-green-300 transition-all transform active:scale-95"
                                     >
                                         Connexion
@@ -261,6 +262,60 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout }) =>
                         </div>
                     </div>
                 </>
+            )}
+
+            {/* Auth Selection Modal */}
+            {showAuthModal && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in" onClick={() => setShowAuthModal(false)}>
+                    <div className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl scale-100 animate-scale-in relative" onClick={e => e.stopPropagation()}>
+                        <button onClick={() => setShowAuthModal(false)} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                            <X size={20} />
+                        </button>
+
+                        <div className="text-center mb-8">
+                            <div className="w-16 h-16 bg-green-100 text-[#008751] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <UserIcon size={32} />
+                            </div>
+                            <h3 className="text-2xl font-black text-gray-900">Bienvenue</h3>
+                            <p className="text-gray-500 font-medium">Choisissez votre espace de connexion</p>
+                        </div>
+
+                        <div className="space-y-3">
+                            <button onClick={() => { onNavigate('LOGIN_VOYAGEUR'); setShowAuthModal(false); }} className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#008751] hover:bg-green-50 transition-all group text-left">
+                                <div className="w-10 h-10 rounded-full bg-green-100 text-[#008751] flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <UserIcon size={20} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-900">Je voyage</p>
+                                    <p className="text-xs text-gray-500">Espace Client</p>
+                                </div>
+                                <ChevronRight className="ml-auto text-gray-300 group-hover:text-[#008751]" size={20} />
+                            </button>
+
+                            <button onClick={() => { onNavigate('LOGIN_COMPANY'); setShowAuthModal(false); }} className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#e9b400] hover:bg-yellow-50 transition-all group text-left">
+                                <div className="w-10 h-10 rounded-full bg-yellow-100 text-[#e9b400] flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Briefcase size={20} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-900">Partenaire</p>
+                                    <p className="text-xs text-gray-500">Espace Compagnie</p>
+                                </div>
+                                <ChevronRight className="ml-auto text-gray-300 group-hover:text-[#e9b400]" size={20} />
+                            </button>
+
+                            <button onClick={() => { onNavigate('LOGIN_ADMIN'); setShowAuthModal(false); }} className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-gray-800 hover:bg-gray-50 transition-all group text-left">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Shield size={20} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-900">Administration</p>
+                                    <p className="text-xs text-gray-500">Accès Réservé</p>
+                                </div>
+                                <ChevronRight className="ml-auto text-gray-300 group-hover:text-gray-900" size={20} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </>
     );

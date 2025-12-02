@@ -4,12 +4,12 @@ import {
   Briefcase, Search, MapPin, Calendar, CreditCard, Ticket, Globe,
   AlertTriangle, TrendingUp, Server, Cloud, Smartphone, Mail, Facebook, Twitter, Linkedin, Instagram
 } from 'lucide-react';
-import { User, Station } from '../types';
-import { Footer } from '../components/Footer';
-import { getStations, getUsers } from '../services/storage';
+import { User, Station, ViewState } from '../../shared/types';
+import { Footer } from '../../shared/components/Footer';
+import { getStations, getUsers } from '../../shared/services/storage';
 
 interface Props {
-  onNavigate: (page: string, params?: any) => void;
+  onNavigate: (page: ViewState, params?: any) => void;
   user: User | null;
 }
 
@@ -45,12 +45,13 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
     // Scroll to top on mount
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Load popular routes from approved companies
+    // Load popular stations from approved companies
     const stations = getStations();
     const approvedCompanies = getUsers().filter(u => u.role === 'COMPANY' && u.status === 'APPROVED');
     const approvedCompanyIds = approvedCompanies.map(c => c.id);
-    
-    const approvedStations = stations.filter(s => approvedCompanyIds.includes(s.companyId));
+
+    // Get only STATION type (sub-stations) from approved companies
+    const approvedStations = stations.filter(s => approvedCompanyIds.includes(s.companyId) && s.type === 'STATION');
     setPopularRoutes(approvedStations.slice(0, 3));
   }, []);
 
@@ -370,48 +371,55 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
-              Destinations <span className="text-[#008751]">Populaires</span>
+              Sous-stations <span className="text-[#008751]">Populaires</span>
             </h2>
             <p className="text-xl text-gray-500 max-w-3xl mx-auto">
-              Explorez les trajets les plus demandés à travers le Bénin
+              Explorez nos points de présence à travers le Bénin
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {popularRoutes.length > 0 ? popularRoutes.map((route, idx) => (
-              <div key={route.id} className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-                <img src={route.photoUrl || `https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800`} alt={`${route.pointA} to ${route.pointB}`} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2 text-white">
-                      <span className="font-bold text-lg">{route.pointA}</span>
-                      <ArrowRight size={18} className="text-[#FCD116]" />
-                      <span className="font-bold text-lg">{route.pointB}</span>
+            {popularRoutes.length > 0 ? popularRoutes.map((station, idx) => {
+              const allStations = getStations();
+              const routeCount = allStations.filter(s => s.parentId === station.id).length;
+
+              return (
+                <div key={station.id} onClick={() => onNavigate('SEARCH_RESULTS', { departure: station.location, arrival: '', date: '' })} className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
+                  <img src={station.photoUrl || `https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800`} alt={station.name} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-white">
+                        <h3 className="font-bold text-xl mb-1">{station.name}</h3>
+                        <div className="flex items-center gap-2 text-sm opacity-90">
+                          <MapPin size={14} />
+                          <span>{station.location}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-gray-300">
-                      <span className="text-xs bg-white/20 px-2 py-1 rounded">{route.companyName}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs text-gray-400 block">À partir de</span>
-                      <span className="text-2xl font-bold text-[#FCD116]">{route.price} F</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-sm text-gray-300">
+                        <span className="text-xs bg-white/20 px-2 py-1 rounded">{station.companyName}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-gray-400 block">Trajets disponibles</span>
+                        <span className="text-2xl font-bold text-[#FCD116]">{routeCount}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )) : (
+              );
+            }) : (
               <div className="col-span-3 text-center py-12 text-gray-500">
-                <p className="text-lg font-medium">Aucune destination disponible pour le moment</p>
+                <p className="text-lg font-medium">Aucune station disponible pour le moment</p>
                 <p className="text-sm mt-2">Les compagnies approuvées apparaîtront ici</p>
               </div>
             )}
           </div>
 
           <div className="text-center mt-12">
-            <button onClick={() => onNavigate('COMPANIES')} className="bg-[#008751] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-green-200 inline-flex items-center gap-2">
-              Voir toutes les destinations <ArrowRight size={20} />
+            <button onClick={() => onNavigate('COMPANIES_LIST')} className="bg-[#008751] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-green-200 inline-flex items-center gap-2">
+              Voir toutes les stations <ArrowRight size={20} />
             </button>
           </div>
         </div>
@@ -480,7 +488,7 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
         </div>
       </section>
 
-      <Footer onNavigate={onNavigate} />
+
     </div>
   );
 };

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { UserRole } from '../../types';
-import { getUsers, saveUser, setCurrentUser } from '../../services/storage';
+import { UserRole, User, ViewState } from '../../shared/types';
+import { getUsers, saveUser, setCurrentUser } from '../../shared/services/storage';
 import { Eye, EyeOff, ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface Props {
-    onNavigate: (view: string) => void;
+    onNavigate: (view: ViewState, params?: any) => void;
     notify: (msg: string, type: 'success' | 'error' | 'info') => void;
-    setUser: (user: any) => void;
+    setUser: (user: User) => void;
 }
 
 export const LoginVoyageur: React.FC<Props> = ({ onNavigate, notify, setUser }) => {
