@@ -596,7 +596,7 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
       {/* Station Details Modal */}
       {renderStationDetailsModal()}
 
-      <BottomNav user={user} activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNav user={user} activeTab={activeTab} onTabChange={setActiveTab} onLogout={() => onNavigate('LANDING')} />
     </div>
   );
 };

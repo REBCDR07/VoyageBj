@@ -1,21 +1,22 @@
 import React from 'react';
-import { LayoutDashboard, MapPin, User, Ticket, Truck, Users, HelpCircle, Shield, Briefcase } from 'lucide-react';
+import { LayoutDashboard, MapPin, User, Ticket, Truck, Users, HelpCircle, Shield, Briefcase, LogOut } from 'lucide-react';
 import { User as UserType } from '../types';
 
 interface BottomNavProps {
     user: UserType;
     activeTab: string;
     onTabChange: (tab: any) => void;
+    onLogout: () => void;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ user, activeTab, onTabChange }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({ user, activeTab, onTabChange, onLogout }) => {
 
     const renderNavItem = (id: string, label: string, icon: React.ReactNode) => {
         const isActive = activeTab === id;
         return (
             <button
                 key={id}
-                onClick={() => onTabChange(id)}
+                onClick={() => id === 'logout' ? onLogout() : onTabChange(id)}
                 className={`flex flex-col items-center justify-center w-full py-2 transition-all duration-300 ${isActive ? 'text-[#008751] -translate-y-1' : 'text-gray-400 hover:text-gray-600'}`}
             >
                 <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? 'bg-green-50 shadow-sm' : 'bg-transparent'}`}>
@@ -39,6 +40,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ user, activeTab, onTabChan
                 { id: 'browse', label: 'Réserver', icon: <MapPin /> },
                 { id: 'tickets', label: 'Tickets', icon: <Ticket /> },
                 { id: 'profile', label: 'Profil', icon: <User /> },
+                { id: 'logout', label: 'Déconnexion', icon: <LogOut /> },
             ];
         }
 
@@ -49,6 +51,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ user, activeTab, onTabChan
                 { id: 'reservations', label: 'Réservations', icon: <Users /> },
                 { id: 'profile', label: 'Profil', icon: <User /> },
                 { id: 'contact', label: 'Admin', icon: <HelpCircle /> },
+                { id: 'logout', label: 'Déconnexion', icon: <LogOut /> },
             ];
         }
 
@@ -56,6 +59,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ user, activeTab, onTabChan
             return [
                 { id: 'dashboard', label: 'Tableau', icon: <Shield /> },
                 { id: 'profile', label: 'Profil', icon: <User /> },
+                { id: 'logout', label: 'Déconnexion', icon: <LogOut /> },
                 // Add more admin tabs if needed based on AdminDashboard
             ];
         }

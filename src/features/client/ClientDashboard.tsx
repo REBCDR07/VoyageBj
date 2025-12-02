@@ -702,7 +702,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
             </main>
 
             {/* Navigation inférieure */}
-            <BottomNav user={user} activeTab={view} onTabChange={setView} />
+          <BottomNav user={user} activeTab={view} onTabChange={setView} onLogout={onLogout} />
 
 
             {/* Modal de réservation */}

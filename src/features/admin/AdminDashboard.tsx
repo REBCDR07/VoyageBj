@@ -415,7 +415,7 @@ export const AdminDashboard: React.FC<Props> = ({ user, notify, onNavigate, init
                 onClose={() => setDetailsModal({ ...detailsModal, isOpen: false })}
                 company={companies.find(c => c.id === detailsModal.companyId) || null}
             />
-            <BottomNav user={user} activeTab={activeTab} onTabChange={setActiveTab} />
+            <BottomNav user={user} activeTab={activeTab} onTabChange={setActiveTab} onLogout={() => onNavigate('LANDING')} />
         </div>
     );
 };
