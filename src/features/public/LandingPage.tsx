@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Truck, ShieldCheck, Users, ArrowRight, Clock, Map, Star, CheckCircle,
   Briefcase, Search, MapPin, Calendar, CreditCard, Ticket, Globe,
-  AlertTriangle, TrendingUp, Server, Cloud, Smartphone, Mail, Facebook, Twitter, Linkedin, Instagram
+  AlertTriangle, TrendingUp, Server, Cloud, Smartphone, Mail, Facebook, Twitter, Linkedin, Instagram,
+  ChevronRight, Play, Zap, Award, Heart, Bus
 } from 'lucide-react';
 import { User, Station, ViewState } from '../../shared/types';
-import { Footer } from '../../shared/components/Footer';
 import { getStations, getUsers } from '../../shared/services/storage';
 
 interface Props {
@@ -20,9 +20,15 @@ const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop"
 ];
 
+const PARTNERS = [
+  "Baobab Express", "ATT Transport", "La Poste", "STM", "Rana Transport", "Confort Lines"
+];
+
 export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [popularRoutes, setPopularRoutes] = useState<Station[]>([]);
+  const [activeStep, setActiveStep] = useState(1);
+  const [workflowType, setWorkflowType] = useState<'VOYAGEUR' | 'COMPANY'>('VOYAGEUR');
 
   // Compteurs d'animation
   const [stats, setStats] = useState({
@@ -41,16 +47,21 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // Cycle animation
   useEffect(() => {
-    // Scroll to top on mount
+    const maxSteps = workflowType === 'VOYAGEUR' ? 3 : 4;
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev % maxSteps) + 1);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [workflowType]);
+
+  useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Load popular stations from approved companies
     const stations = getStations();
     const approvedCompanies = getUsers().filter(u => u.role === 'COMPANY' && u.status === 'APPROVED');
     const approvedCompanyIds = approvedCompanies.map(c => c.id);
-
-    // Get only STATION type (sub-stations) from approved companies
     const approvedStations = stations.filter(s => approvedCompanyIds.includes(s.companyId) && s.type === 'STATION');
     setPopularRoutes(approvedStations.slice(0, 3));
   }, []);
@@ -85,409 +96,437 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
     }, 16);
   };
 
+  const getWorkflowSteps = () => {
+    if (workflowType === 'VOYAGEUR') {
+      return [
+        { id: 1, icon: Search, label: "Recherche", color: "blue", pos: "top-0 left-1/2 -translate-x-1/2 -translate-y-8", title: "Trouvez votre trajet", desc: "Comparez les horaires et tarifs de toutes les compagnies." },
+        { id: 2, icon: CheckCircle, label: "Sélection", color: "green", pos: "bottom-0 right-0 translate-x-4 translate-y-4", title: "Choisissez votre place", desc: "Sélectionnez votre siège préféré sur le plan du bus." },
+        { id: 3, icon: Ticket, label: "Voyage", color: "red", pos: "bottom-0 left-0 -translate-x-4 translate-y-4", title: "Embarquez !", desc: "Recevez votre e-billet et présentez-le au départ." }
+      ];
+    } else {
+      return [
+        { id: 1, icon: Briefcase, label: "Inscription", color: "blue", pos: "top-0 left-1/2 -translate-x-1/2 -translate-y-8", title: "Créez votre compte", desc: "Inscrivez votre compagnie en quelques clics." },
+        { id: 2, icon: ShieldCheck, label: "Validation", color: "green", pos: "right-0 top-1/2 translate-x-8 -translate-y-1/2", title: "Vérification", desc: "Nous validons vos documents officiels (ANaTT)." },
+        { id: 3, icon: Map, label: "Gestion", color: "yellow", pos: "bottom-0 left-1/2 -translate-x-1/2 translate-y-8", title: "Publiez vos trajets", desc: "Gérez vos lignes, horaires et tarifs facilement." },
+        { id: 4, icon: TrendingUp, label: "Revenus", color: "red", pos: "left-0 top-1/2 -translate-x-8 -translate-y-1/2", title: "Encaissez", desc: "Recevez vos paiements et suivez vos statistiques." }
+      ];
+    }
+  };
+
+  const steps = getWorkflowSteps();
+
   return (
-    <div className="bg-white font-sans min-h-screen flex flex-col pt-[60px]">
-      {/* Section Hero 3D */}
-      <div className="relative bg-gray-900 h-[600px] md:h-[750px] overflow-hidden flex items-center justify-center perspective-[1000px]">
-        {/* Carrousel d'images */}
+    <div className="bg-white font-sans min-h-screen flex flex-col overflow-x-hidden">
+
+      {/* 1. HERO SECTION PREMIUM V2 */}
+      <div className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+        {/* Background Slider */}
         {HERO_IMAGES.map((img, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-all duration-[2000ms] ease-in-out transform ${index === currentImageIndex ? 'opacity-50 scale-105' : 'opacity-0 scale-100'}`}
+            className={`absolute inset-0 transition-all duration-[2000ms] ease-in-out transform ${index === currentImageIndex ? 'opacity-100 scale-105' : 'opacity-0 scale-100'}`}
           >
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/80 z-10"></div>
             <img src={img} alt="Hero" className="w-full h-full object-cover" />
           </div>
         ))}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-gray-900"></div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 text-center transform transition-transform duration-500 hover:scale-[1.01]">
-          <span className="inline-block py-2 px-5 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-bold uppercase tracking-widest mb-8 border border-white/20 animate-fade-in shadow-lg">
-            🇧🇯 Le réseau de transport n°1 au Bénin
-          </span>
-          <h1 className="text-5xl md:text-8xl font-extrabold text-white tracking-tight mb-8 leading-tight drop-shadow-2xl">
-            Votre voyage commence <br />
-            <span className="text-transparent bg-clip-text benin-gradient-text">maintenant.</span>
-          </h1>
-          <p className="text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto mb-12 drop-shadow-md font-light">
-            Comparez les compagnies, choisissez votre siège et réservez votre ticket de bus en toute sécurité depuis votre smartphone.
-          </p>
+        <div className="relative z-20 max-w-7xl mx-auto px-4 w-full flex flex-col items-center justify-center h-full pt-20">
 
-          {/* Boutons CTA 3D doubles */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6 perspective-[1000px]">
-            <button
-              onClick={() => onNavigate('SIGNUP_VOYAGEUR')}
-              className="group w-full md:w-auto bg-[#008751] text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-[#006b40] transition-all shadow-[0_20px_50px_-12px_rgba(22,163,74,0.5)] flex items-center justify-center gap-3 transform hover:-translate-y-1 hover:rotate-1 border border-lime-400/30"
-            >
-              <Users className="w-6 h-6" />
-              <span>Je voyage</span>
-              <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-all -ml-2 group-hover:ml-0" />
-            </button>
-            <button
-              onClick={() => onNavigate('SIGNUP_COMPANY')}
-              className="group w-full md:w-auto bg-white/5 backdrop-blur-md text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-3 border border-white/30 shadow-lg transform hover:-translate-y-1 hover:-rotate-1"
-            >
-              <Briefcase className="w-6 h-6" />
-              <span>Je suis une Compagnie</span>
-              <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-all -ml-2 group-hover:ml-0" />
-            </button>
+          {/* Floating Grid Cards (Background Effect) */}
+          <div className="absolute inset-0 pointer-events-none hidden lg:block">
+            {/* Card 1: Ticket */}
+            <div className="absolute top-1/4 left-10 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 transform -rotate-6 animate-float-slow">
+              <div className="flex items-center gap-4 mb-2">
+                <div className="w-10 h-10 bg-[#008751] rounded-full flex items-center justify-center text-white"><Bus size={20} /></div>
+                <div className="text-white">
+                  <div className="font-bold text-sm">Cotonou</div>
+                  <div className="text-xs opacity-70">08:00</div>
+                </div>
+                <ArrowRight className="text-white/50" size={16} />
+                <div className="text-white text-right">
+                  <div className="font-bold text-sm">Parakou</div>
+                  <div className="text-xs opacity-70">14:30</div>
+                </div>
+              </div>
+              <div className="w-full h-1 bg-white/20 rounded-full mt-2"></div>
+            </div>
+
+            {/* Card 2: Reservation */}
+            <div className="absolute bottom-1/3 right-10 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 transform rotate-3 animate-float-delayed">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl overflow-hidden">
+                  <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=100" className="w-full h-full object-cover" />
+                </div>
+                <div className="text-white">
+                  <div className="font-bold text-sm">Baobab Express</div>
+                  <div className="text-xs text-[#FCD116] font-bold">Confirmé</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center max-w-4xl mx-auto relative z-30">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-bold mb-8 animate-fade-in-up">
+              <span className="w-2 h-2 rounded-full bg-[#008751] animate-pulse"></span>
+              <span>La référence du voyage au Bénin</span>
+            </div>
+
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white leading-tight mb-8 drop-shadow-2xl animate-fade-in-up delay-100 font-['Dancing_Script']">
+              <span className="text-[#008751]">Voyage</span>
+              <span className="text-[#FCD116]">B</span>
+              <span className="text-[#E8112D]">j</span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-gray-200 mb-12 leading-relaxed max-w-2xl mx-auto font-light animate-fade-in-up delay-200">
+              Réservez vos billets de bus en ligne, simplement et en toute sécurité.
+              <br className="hidden md:block" />
+              <span className="text-[#FCD116] font-medium">Voyagez mieux, voyagez connecté.</span>
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-6 justify-center animate-fade-in-up delay-300">
+              <button
+                onClick={() => onNavigate('SIGNUP_VOYAGEUR')}
+                className="group bg-[#008751] hover:bg-[#006b40] text-white px-10 py-5 rounded-full font-bold text-lg transition-all shadow-[0_0_30px_rgba(0,135,81,0.4)] hover:shadow-[0_0_50px_rgba(0,135,81,0.6)] flex items-center justify-center gap-3 transform hover:-translate-y-1"
+              >
+                <span>Je réserve mon billet</span>
+                <div className="bg-white/20 rounded-full p-1 group-hover:translate-x-1 transition-transform">
+                  <ChevronRight size={20} />
+                </div>
+              </button>
+
+              <button
+                onClick={() => onNavigate('SIGNUP_COMPANY')}
+                className="group bg-white/10 backdrop-blur-md hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30 flex items-center justify-center gap-3"
+              >
+                <Briefcase size={20} />
+                <span>Espace Compagnie</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-white/50 z-20">
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
+            <div className="w-1 h-2 bg-white rounded-full"></div>
           </div>
         </div>
       </div>
 
-      {/* Widget de recherche superposé */}
-      <div className="relative z-20 -mt-24 px-4 mb-20">
-        <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl p-8 animate-float border border-gray-100">
-          <h3 className="text-2xl font-bold mb-6 text-center text-gray-900">Trouvez Votre Trajet</h3>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            const form = e.target as HTMLFormElement;
-            const departure = (form.elements[0] as HTMLInputElement).value;
-            const arrival = (form.elements[1] as HTMLInputElement).value;
-            const date = (form.elements[2] as HTMLInputElement).value;
-            onNavigate('SEARCH_RESULTS', { departure, arrival, date });
-          }} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative">
-                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Départ</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 text-gray-400" size={18} />
-                  <input type="text" placeholder="Ville de départ" className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008751] outline-none bg-gray-50 focus:bg-white transition-colors" list="cities" />
-                </div>
-              </div>
-              <div className="relative">
-                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Arrivée</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 text-gray-400" size={18} />
-                  <input type="text" placeholder="Ville d'arrivée" className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008751] outline-none bg-gray-50 focus:bg-white transition-colors" list="cities" />
-                </div>
-              </div>
-              <div className="relative">
-                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Date</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-3 text-gray-400" size={18} />
-                  <input type="date" className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008751] outline-none bg-gray-50 focus:bg-white transition-colors" min={new Date().toISOString().split('T')[0]} />
-                </div>
-              </div>
-              <div className="flex items-end">
-                <button type="submit" className="w-full bg-[#008751] text-white py-2.5 rounded-xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-green-200 flex items-center justify-center gap-2 h-[42px]">
-                  <Search size={20} /> Rechercher
+      {/* 2. CREDIBILITY MARQUEE */}
+      <div className="bg-white py-10 border-b border-gray-100 overflow-hidden">
+        <p className="text-center text-gray-400 text-sm font-bold uppercase tracking-widest mb-8">Ils nous font confiance</p>
+        <div className="relative flex overflow-x-hidden group">
+          <div className="animate-marquee whitespace-nowrap flex items-center gap-16 px-8">
+            {[...PARTNERS, ...PARTNERS, ...PARTNERS].map((partner, idx) => (
+              <span key={idx} className="text-2xl font-black text-gray-300 hover:text-[#008751] transition-colors cursor-default">
+                {partner}
+              </span>
+            ))}
+          </div>
+          <div className="absolute top-0 animate-marquee2 whitespace-nowrap flex items-center gap-16 px-8">
+            {[...PARTNERS, ...PARTNERS, ...PARTNERS].map((partner, idx) => (
+              <span key={`dup-${idx}`} className="text-2xl font-black text-gray-300 hover:text-[#008751] transition-colors cursor-default">
+                {partner}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. HOW IT WORKS - ROTARY CYCLE V2 */}
+      <section className="py-24 bg-gray-50 overflow-hidden relative">
+        {/* Decorative blobs */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#008751]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#e9b400]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+              Comment ça <span className="text-[#008751] font-['Dancing_Script'] text-5xl md:text-6xl">marche ?</span>
+            </h2>
+
+            {/* Toggle Switch */}
+            <div className="flex justify-center mb-8">
+              <div className="bg-white p-1 rounded-full border border-gray-200 shadow-sm inline-flex">
+                <button
+                  onClick={() => { setWorkflowType('VOYAGEUR'); setActiveStep(1); }}
+                  className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${workflowType === 'VOYAGEUR' ? 'bg-[#008751] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+                >
+                  Voyageur
+                </button>
+                <button
+                  onClick={() => { setWorkflowType('COMPANY'); setActiveStep(1); }}
+                  className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${workflowType === 'COMPANY' ? 'bg-[#008751] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+                >
+                  Compagnie
                 </button>
               </div>
             </div>
-            <datalist id="cities">
-              <option value="Cotonou" />
-              <option value="Porto-Novo" />
-              <option value="Parakou" />
-              <option value="Abomey-Calavi" />
-              <option value="Bohicon" />
-              <option value="Natitingou" />
-              <option value="Djougou" />
-              <option value="Kandi" />
-              <option value="Malanville" />
-              <option value="Ouidah" />
-              <option value="Abomey" />
-              <option value="Lokossa" />
-            </datalist>
-          </form>
-        </div>
-      </div>
 
-      {/* Section Statistiques */}
-      <div ref={statsRef} className="bg-white pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-gray-100">
-            <div className="text-center">
-              <div className="text-4xl font-extrabold text-[#008751] mb-2">{stats.partners}+</div>
-              <div className="text-sm text-gray-500 font-medium uppercase tracking-wider">Compagnies</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-extrabold text-[#e9b400] mb-2">{stats.cities}+</div>
-              <div className="text-sm text-gray-500 font-medium uppercase tracking-wider">Villes</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-extrabold text-[#e8112d] mb-2">{stats.travelers.toLocaleString()}</div>
-              <div className="text-sm text-gray-500 font-medium uppercase tracking-wider">Voyageurs</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-extrabold text-gray-900 mb-2">{stats.satisfaction}%</div>
-              <div className="text-sm text-gray-500 font-medium uppercase tracking-wider">Satisfaction</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Section Mission */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
-              Pourquoi <span className="text-[#008751]">VoyageBJ</span> ?
-            </h2>
-            <p className="text-xl text-gray-500 max-w-3xl mx-auto">
-              Nous digitalisons le secteur du transport terrestre béninois pour offrir
-              une expérience moderne, sécurisée et efficace.
+            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+              {workflowType === 'VOYAGEUR'
+                ? "Réservez votre prochain voyage en 3 étapes simples."
+                : "Digitalisez votre activité de transport et augmentez vos revenus."}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-              <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 mb-6 group-hover:scale-110 transition-transform">
-                <AlertTriangle size={28} />
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left: Interactive Cycle Visual */}
+            <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center">
+              {/* Central Circle */}
+              <div className="absolute w-[280px] h-[280px] md:w-[350px] md:h-[350px] border-2 border-dashed border-gray-200 rounded-full animate-spin-slow"></div>
+              <div className="absolute w-[180px] h-[180px] bg-white rounded-full shadow-2xl flex items-center justify-center z-10 p-8 text-center border-4 border-gray-50">
+                <div>
+                  <div className="text-[#008751] font-black text-5xl mb-2">0{activeStep}</div>
+                  <div className="text-gray-400 font-bold uppercase text-sm tracking-wider">Étape</div>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Le Défi Actuel</h3>
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-2"><CheckCircle size={18} className="text-red-500 mt-1 shrink-0" /> Réservation archaïque</li>
-                <li className="flex items-start gap-2"><CheckCircle size={18} className="text-red-500 mt-1 shrink-0" /> Manque de transparence</li>
-                <li className="flex items-start gap-2"><CheckCircle size={18} className="text-red-500 mt-1 shrink-0" /> Insécurité des paiements</li>
-              </ul>
+
+              {/* Orbiting Steps */}
+              {steps.map((step) => (
+                <div
+                  key={step.id}
+                  className={`absolute ${step.pos} transition-all duration-500 transform ${activeStep === step.id ? 'scale-125 z-20' : 'scale-100 z-10 opacity-70'}`}
+                >
+                  <div
+                    className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-300 cursor-pointer ${activeStep === step.id ? 'bg-[#008751] text-white ring-4 ring-green-100' : 'bg-white text-gray-400 hover:bg-gray-50'}`}
+                    onClick={() => setActiveStep(step.id)}
+                  >
+                    <step.icon size={28} />
+                  </div>
+                  <div className={`text-center mt-3 font-bold text-sm md:text-base transition-colors duration-300 ${activeStep === step.id ? 'text-[#008751]' : 'text-gray-400'}`}>
+                    {step.label}
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-              <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-[#008751] mb-6 group-hover:scale-110 transition-transform">
-                <TrendingUp size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Notre Solution</h3>
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-2"><CheckCircle size={18} className="text-[#008751] mt-1 shrink-0" /> Plateforme 24h/24</li>
-                <li className="flex items-start gap-2"><CheckCircle size={18} className="text-[#008751] mt-1 shrink-0" /> Réservation instantanée</li>
-                <li className="flex items-start gap-2"><CheckCircle size={18} className="text-[#008751] mt-1 shrink-0" /> Paiements Mobile Money</li>
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
-                <Globe size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Impact Stratégique</h3>
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-2"><CheckCircle size={18} className="text-blue-500 mt-1 shrink-0" /> Digitalisation du secteur</li>
-                <li className="flex items-start gap-2"><CheckCircle size={18} className="text-blue-500 mt-1 shrink-0" /> Écosystème intégré</li>
-                <li className="flex items-start gap-2"><CheckCircle size={18} className="text-blue-500 mt-1 shrink-0" /> Optimisation des revenus</li>
-              </ul>
+            {/* Right: Step Details */}
+            <div className="space-y-6">
+              {steps.map((step) => (
+                <div
+                  key={step.id}
+                  className={`flex gap-6 p-6 rounded-2xl transition-all duration-500 cursor-pointer ${activeStep === step.id ? 'bg-white shadow-xl border-l-4 border-[#008751] transform translate-x-2 md:translate-x-4' : 'hover:bg-white/50'}`}
+                  onClick={() => setActiveStep(step.id)}
+                >
+                  <div className={`text-2xl font-black ${activeStep === step.id ? 'text-[#008751]' : 'text-gray-300'}`}>0{step.id}</div>
+                  <div>
+                    <h3 className={`text-xl font-bold mb-2 ${activeStep === step.id ? 'text-gray-900' : 'text-gray-500'}`}>{step.title}</h3>
+                    <p className={`${activeStep === step.id ? 'text-gray-600' : 'text-gray-400 hidden lg:block'}`}>{step.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section Comment ça marche */}
-      <div id="process" className="py-24 bg-white relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-lime-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-
+      {/* 4. STATS & IMPACT */}
+      <div ref={statsRef} className="bg-[#008751] py-20 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">Comment ça marche ?</h2>
-            <p className="text-xl text-gray-500">Votre voyage simplifié en 4 étapes.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 relative z-10">
-            {[
-              { step: 1, title: "Recherche", icon: Search, desc: "Trouvez votre trajet" },
-              { step: 2, title: "Sélection", icon: CheckCircle, desc: "Choisissez votre siège" },
-              { step: 3, title: "Voyage", icon: Ticket, desc: "Recevez votre e-billet" }
-            ].map((item, idx) => (
-              <div key={idx} className="bg-white p-6 rounded-3xl text-center border border-gray-100 shadow-sm hover:shadow-md transition-all group">
-                <div className="w-16 h-16 bg-[#008751] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 shadow-lg shadow-green-200 group-hover:scale-110 transition-transform">
-                  {item.step}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-500 text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Sections Audience */}
-      <div className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="order-2 lg:order-1">
-              <span className="text-benin-green font-bold tracking-widest uppercase text-sm mb-2 block">Pour les Compagnies</span>
-              <h2 className="text-4xl font-extrabold text-gray-900 mb-6">Digitalisez votre agence de transport</h2>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Rejoignez le plus grand réseau de transporteurs au Bénin. Gérez vos départs, suivez vos ventes en temps réel et remplissez vos bus plus rapidement.
-              </p>
-              <div className="space-y-4 mb-10">
-                <div className="flex items-center gap-4 group cursor-default">
-                  <div className="bg-lime-100 p-2 rounded-lg text-benin-green group-hover:bg-[#008751] group-hover:text-white transition-colors"><Users size={20} /></div>
-                  <span className="font-medium text-gray-700 group-hover:translate-x-2 transition-transform">Accès à une clientèle nationale</span>
-                </div>
-                <div className="flex items-center gap-4 group cursor-default">
-                  <div className="bg-lime-100 p-2 rounded-lg text-benin-green group-hover:bg-[#008751] group-hover:text-white transition-colors"><Briefcase size={20} /></div>
-                  <span className="font-medium text-gray-700 group-hover:translate-x-2 transition-transform">Outils de gestion complets (Stats, Listes)</span>
-                </div>
-                <div className="flex items-center gap-4 group cursor-default">
-                  <div className="bg-lime-100 p-2 rounded-lg text-benin-green group-hover:bg-[#008751] group-hover:text-white transition-colors"><ShieldCheck size={20} /></div>
-                  <span className="font-medium text-gray-700 group-hover:translate-x-2 transition-transform">Paiements sécurisés et garantis</span>
-                </div>
-              </div>
-              <button
-                onClick={() => onNavigate('SIGNUP_COMPANY')}
-                className="bg-[#008751] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-lime-200 flex items-center gap-2 hover:-translate-y-1"
-              >
-                Devenir Partenaire <ArrowRight size={20} />
-              </button>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-black">{stats.partners}+</div>
+              <div className="text-green-200 font-medium uppercase tracking-wider text-xs md:text-sm">Compagnies</div>
             </div>
-            <div className="order-1 lg:order-2 relative group perspective-[1000px]">
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#008751] to-[#e9b400] rounded-3xl transform rotate-3 shadow-2xl group-hover:rotate-6 transition-transform duration-500"></div>
-              <img
-                src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=1000&auto=format&fit=crop"
-                alt="Bus Driver"
-                className="relative rounded-3xl shadow-xl w-full h-[500px] object-cover transform group-hover:-translate-y-4 group-hover:-rotate-2 transition-transform duration-500"
-              />
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-black">{stats.cities}+</div>
+              <div className="text-green-200 font-medium uppercase tracking-wider text-xs md:text-sm">Villes Desservies</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-black">{stats.travelers.toLocaleString()}</div>
+              <div className="text-green-200 font-medium uppercase tracking-wider text-xs md:text-sm">Voyageurs Heureux</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-black">{stats.satisfaction}%</div>
+              <div className="text-green-200 font-medium uppercase tracking-wider text-xs md:text-sm">Satisfaction</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Grille des fonctionnalités */}
-      <div id="features" className="py-24 bg-white">
+      {/* 5. POPULAR ROUTES */}
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900">Pourquoi choisir VoyageBj ?</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: Map, title: "Couverture Totale", text: "De Cotonou à Malanville, trouvez des départs pour toutes les villes majeures.", color: "indigo" },
-              { icon: Clock, title: "Gain de Temps", text: "Fini les files d'attente interminables en gare. Réservez depuis votre canapé.", color: "orange" },
-              { icon: ShieldCheck, title: "Sécurité Vérifiée", text: "Nous vérifions les documents ANaTT de chaque compagnie partenaire.", color: "teal" },
-              { icon: Star, title: "Service Premium", text: "Un support client dédié et une interface pensée pour votre confort.", color: "yellow" }
-            ].map((feature, idx) => (
-              <div key={idx} className="p-8 rounded-3xl bg-gray-50 hover:bg-white hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-gray-100 group transform hover:-translate-y-2">
-                <div className={`bg-white w-16 h-16 rounded-2xl flex items-center justify-center text-${feature.color}-600 shadow-md mb-6 group-hover:scale-110 transition-transform group-hover:rotate-3`}>
-                  <feature.icon size={32} />
-                </div>
-                <h3 className="font-bold text-xl text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-500 leading-relaxed">{feature.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Popular Destinations Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
-              Sous-stations <span className="text-[#008751]">Populaires</span>
-            </h2>
-            <p className="text-xl text-gray-500 max-w-3xl mx-auto">
-              Explorez nos points de présence à travers le Bénin
-            </p>
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+                Destinations <span className="text-[#e9b400]">Populaires</span>
+              </h2>
+              <p className="text-gray-500 text-lg">Découvrez les gares les plus fréquentées du moment.</p>
+            </div>
+            <button onClick={() => onNavigate('COMPANIES_LIST')} className="text-[#008751] font-bold flex items-center gap-2 hover:gap-4 transition-all">
+              Voir toutes les gares <ArrowRight size={20} />
+            </button>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {popularRoutes.length > 0 ? popularRoutes.map((station, idx) => {
+            {popularRoutes.length > 0 ? popularRoutes.map((station) => {
               const allStations = getStations();
               const routeCount = allStations.filter(s => s.parentId === station.id).length;
 
               return (
-                <div key={station.id} onClick={() => onNavigate('SEARCH_RESULTS', { departure: station.location, arrival: '', date: '' })} className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-                  <img src={station.photoUrl || `https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800`} alt={station.name} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-white">
-                        <h3 className="font-bold text-xl mb-1">{station.name}</h3>
-                        <div className="flex items-center gap-2 text-sm opacity-90">
-                          <MapPin size={14} />
-                          <span>{station.location}</span>
-                        </div>
-                      </div>
+                <div key={station.id} onClick={() => onNavigate('SEARCH_RESULTS', { departure: station.location, arrival: '', date: '' })} className="group relative h-[400px] rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500">
+                  <img src={station.photoUrl || `https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800`} alt={station.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+
+                  <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs font-bold border border-white/30">
+                    {station.companyName}
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                    <div className="flex items-center gap-2 text-[#e9b400] mb-2 font-bold">
+                      <MapPin size={16} />
+                      <span>{station.location}</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-gray-300">
-                        <span className="text-xs bg-white/20 px-2 py-1 rounded">{station.companyName}</span>
+                    <h3 className="text-3xl font-black text-white mb-4">{station.name}</h3>
+
+                    <div className="flex items-center justify-between border-t border-white/20 pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                      <div className="text-white">
+                        <span className="block text-2xl font-bold">{routeCount}</span>
+                        <span className="text-xs text-gray-300 uppercase">Départs / Jour</span>
                       </div>
-                      <div className="text-right">
-                        <span className="text-xs text-gray-400 block">Trajets disponibles</span>
-                        <span className="text-2xl font-bold text-[#FCD116]">{routeCount}</span>
+                      <div className="w-10 h-10 bg-[#008751] rounded-full flex items-center justify-center text-white">
+                        <ArrowRight size={20} />
                       </div>
                     </div>
                   </div>
                 </div>
               );
             }) : (
-              <div className="col-span-3 text-center py-12 text-gray-500">
-                <p className="text-lg font-medium">Aucune station disponible pour le moment</p>
-                <p className="text-sm mt-2">Les compagnies approuvées apparaîtront ici</p>
+              <div className="col-span-3 text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                <p className="text-gray-400 font-medium">Chargement des destinations...</p>
               </div>
             )}
-          </div>
-
-          <div className="text-center mt-12">
-            <button onClick={() => onNavigate('COMPANIES_LIST')} className="bg-[#008751] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-green-200 inline-flex items-center gap-2">
-              Voir toutes les stations <ArrowRight size={20} />
-            </button>
           </div>
         </div>
       </section>
 
-      {/* Technology & Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 6. TESTIMONIALS */}
+      <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-[#008751] rounded-full mix-blend-overlay blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-64 h-64 bg-[#e9b400] rounded-full mix-blend-overlay blur-3xl"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
-              Une plateforme <span className="text-[#008751]">moderne</span> et <span className="text-[#e9b400]">sécurisée</span>
-            </h2>
-            <p className="text-xl text-gray-500 max-w-3xl mx-auto">
-              Technologie de pointe pour une expérience utilisateur exceptionnelle
-            </p>
+            <h2 className="text-3xl md:text-4xl font-black mb-4">La parole aux <span className="text-[#e9b400]">voyageurs</span></h2>
+            <p className="text-gray-400">Découvrez pourquoi des milliers de béninois nous font confiance.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {[
-              { icon: Smartphone, title: "Application Mobile", desc: "Interface responsive adaptée à tous les écrans", color: "blue" },
-              { icon: Cloud, title: "Cloud Sécurisé", desc: "Vos données protégées et sauvegardées", color: "purple" },
-              { icon: CreditCard, title: "Paiements Intégrés", desc: "Mobile Money et cartes bancaires acceptés", color: "green" },
-              { icon: Server, title: "Disponibilité 24/7", desc: "Plateforme accessible à tout moment", color: "red" }
-            ].map((tech, idx) => (
-              <div key={idx} className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-2xl border border-gray-100 hover:border-[#008751] transition-all group hover:shadow-xl">
-                <div className={`w-14 h-14 bg-${tech.color}-50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <tech.icon size={28} className={`text-${tech.color}-600`} />
+              { name: "Jean D.", role: "Voyageur fréquent", text: "VoyageBJ a transformé ma façon de voyager. Plus besoin de me déplacer à la gare à l'avance, je réserve en ligne et j'ai mon billet sur mon téléphone.", color: "green" },
+              { name: "Marie T.", role: "Directrice de compagnie", text: "Depuis que nous sommes sur VoyageBJ, notre taux d'occupation a augmenté de 30%. La plateforme nous permet de mieux gérer nos trajets et nos revenus.", color: "yellow" },
+              { name: "Koffi A.", role: "Étudiant", text: "En tant qu'étudiant, les tarifs avantageux et la facilité d'utilisation de VoyageBJ me permettent de rentrer chez moi plus souvent sans me ruiner.", color: "red" }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-all hover:-translate-y-2">
+                <div className="flex items-center gap-1 mb-6 text-[#e9b400]">
+                  <Star size={16} fill="currentColor" />
+                  <Star size={16} fill="currentColor" />
+                  <Star size={16} fill="currentColor" />
+                  <Star size={16} fill="currentColor" />
+                  <Star size={16} fill="currentColor" />
                 </div>
-                <h3 className="font-bold text-lg text-gray-900 mb-2">{tech.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{tech.desc}</p>
+                <p className="text-lg text-gray-300 mb-8 leading-relaxed italic">"{item.text}"</p>
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-full bg-gradient-to-br from-${item.color}-500 to-${item.color}-700 flex items-center justify-center font-bold text-lg shadow-lg`}>
+                    {item.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white">{item.name}</h4>
+                    <p className="text-sm text-gray-500">{item.role}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Ils nous font confiance</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-[#008751] rounded-full flex items-center justify-center text-white font-bold mr-4">JD</div>
-                <div><h4 className="font-bold">Jean D.</h4><p className="text-gray-400 text-sm">Voyageur régulier</p></div>
-              </div>
-              <p className="text-gray-300">"VoyageBJ a transformé ma façon de voyager. Plus besoin de me déplacer à la gare à l'avance, je réserve en ligne et j'ai mon billet sur mon téléphone."</p>
+      {/* 7. NEWSLETTER & RETENTION */}
+      <section className="py-24 bg-[#008751] relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+          <div className="bg-white rounded-3xl p-10 md:p-16 shadow-2xl transform rotate-1">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 text-[#008751]">
+              <Mail size={40} />
             </div>
-            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-[#e9b400] rounded-full flex items-center justify-center text-gray-900 font-bold mr-4">MT</div>
-                <div><h4 className="font-bold">Marie T.</h4><p className="text-gray-400 text-sm">Directrice de compagnie</p></div>
-              </div>
-              <p className="text-gray-300">"Depuis que nous sommes sur VoyageBJ, notre taux d'occupation a augmenté de 30%. La plateforme nous permet de mieux gérer nos trajets et nos revenus."</p>
-            </div>
-            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-[#e8112d] rounded-full flex items-center justify-center text-white font-bold mr-4">KA</div>
-                <div><h4 className="font-bold">Koffi A.</h4><p className="text-gray-400 text-sm">Étudiant</p></div>
-              </div>
-              <p className="text-gray-300">"En tant qu'étudiant, les tarifs avantageux et la facilité d'utilisation de VoyageBJ me permettent de rentrer chez moi plus souvent sans me ruiner."</p>
-            </div>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+              Ne manquez aucune <span className="text-[#008751]">offre !</span>
+            </h2>
+            <p className="text-gray-500 text-lg mb-8 max-w-lg mx-auto">
+              Inscrivez-vous à notre newsletter pour recevoir des codes promo exclusifs et être informé des nouvelles lignes.
+            </p>
+
+            <form className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto" onSubmit={(e) => e.preventDefault()}>
+              <input
+                type="email"
+                placeholder="Votre adresse email"
+                className="flex-1 px-6 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#008751] outline-none font-medium"
+              />
+              <button className="bg-[#008751] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-green-200">
+                S'inscrire
+              </button>
+            </form>
+            <p className="text-xs text-gray-400 mt-4">Nous respectons votre vie privée. Désabonnement à tout moment.</p>
           </div>
         </div>
       </section>
 
+      <style>{`
+        @keyframes fade-in-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 0.8s ease-out forwards;
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-100%); }
+        }
+        @keyframes marquee2 {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(0); }
+        }
+        .animate-marquee {
+          animation: marquee 25s linear infinite;
+        }
+        .animate-marquee2 {
+          animation: marquee2 25s linear infinite;
+        }
+        .animate-spin-slow {
+          animation: spin 15s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0) rotate(-6deg); }
+          50% { transform: translateY(-20px) rotate(-6deg); }
+        }
+        @keyframes float-delayed {
+          0%, 100% { transform: translateY(0) rotate(3deg); }
+          50% { transform: translateY(-15px) rotate(3deg); }
+        }
+        .animate-float-slow {
+          animation: float-slow 6s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float-delayed 7s ease-in-out infinite 1s;
+        }
+      `}</style>
 
     </div>
   );

@@ -11,9 +11,9 @@ export type CompanyStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export interface User {
   id: string;
   email: string;
-  password?: string; // Added password as optional
-  name: string; // Manager name for company, Full name for client
-  role: UserRole; // Kept UserRole enum
+  password?: string; // Mot de passe ajouté comme optionnel
+  name: string; // Nom du gestionnaire pour la compagnie, Nom complet pour le client
+  role: UserRole; // Enum UserRole conservé
   avatarUrl?: string;
   npi?: string; // Numéro Personnel d'Identification
 
@@ -25,9 +25,9 @@ export interface User {
   bannerUrl?: string;
   ifu?: string;
   rccm?: string;
-  anattUrl?: string; // Primary auth doc
-  otherDocsUrl?: string; // Supplemental docs
-  status?: CompanyStatus; // Approval status
+  anattUrl?: string; // Document d'authentification principal
+  otherDocsUrl?: string; // Documents supplémentaires
+  status?: CompanyStatus; // Statut d'approbation
 
   // Informations de contact admin
   address?: string;
@@ -37,14 +37,14 @@ export interface User {
 
 export interface Station {
   id: string;
-  parentId?: string; // ID of the parent station (if this is a route)
+  parentId?: string; // ID de la station parente (si c'est un trajet)
   companyId: string;
   companyName: string;
-  type: 'STATION' | 'ROUTE'; // Sub-station or direct route
+  type: 'STATION' | 'ROUTE'; // Sous-station ou trajet direct
   name: string;
   photoUrl: string;
-  location: string; // City/Area
-  mapLink?: string; // Google Maps link
+  location: string; // Ville/Zone
+  mapLink?: string; // Lien Google Maps
   description?: string;
 
   // Horaires d'ouverture (Pour Station)
@@ -54,10 +54,10 @@ export interface Station {
   // Détails du trajet (Pour Route)
   pointA?: string;
   pointB?: string;
-  departurePoint?: string; // Specific spot
+  departurePoint?: string; // Point spécifique
 
   // Horaires
-  workDays: string[]; // ["Mon", "Tue", ...]
+  workDays: string[]; // ["Lun", "Mar", ...]
   departureHours?: string[]; // ["08:00", "14:00"] (Pour Route)
   arrivalHours?: string[]; // ["12:00", "18:00"] (Pour Route)
 
@@ -79,7 +79,7 @@ export interface Reservation {
   // Copie des détails du voyage (instantané au moment de la réservation)
   routeSummary: string;
   departureTime: string;
-  departureDate: string; // ISO Date string
+  departureDate: string; // Chaîne de date ISO
   pricePaid: number;
   ticketClass: 'STANDARD' | 'PREMIUM';
 

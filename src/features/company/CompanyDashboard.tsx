@@ -12,6 +12,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { jsPDF } from "jspdf";
 import { BottomNav } from '../../shared/components/BottomNav';
 import { NotifyFunc } from '../../App';
+import { SettingsModal } from '../../shared/components/SettingsModal';
 
 interface Props {
   user: User;
@@ -24,7 +25,7 @@ interface Props {
 const COLORS = ['#008751', '#e9b400', '#e8112d', '#292a2c']; // Benin Green, Yellow, Red, Dark
 
 export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, setEditStationId, setStationManagerProps }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'stations' | 'reservations' | 'profile'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'stations' | 'reservations' | 'profile' | 'settings'>('overview');
   const [stations, setStations] = useState<Station[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
 
@@ -595,6 +596,13 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
 
       {/* Station Details Modal */}
       {renderStationDetailsModal()}
+
+      {activeTab === 'settings' && (
+        <>
+          {renderOverview()}
+          <SettingsModal onClose={() => setActiveTab('overview')} />
+        </>
+      )}
 
       <BottomNav user={user} activeTab={activeTab} onTabChange={setActiveTab} />
     </div>

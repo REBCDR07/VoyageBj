@@ -7,7 +7,7 @@ Bienvenue sur le projet VoyageBj. Voici comment lancer et travailler sur le proj
 - npm ou yarn
 
 ## Installation
-Installez les dépendances du projet :
+Installez les dépendances du projet après clonage du repo :
 ```bash
 npm install
 # ou

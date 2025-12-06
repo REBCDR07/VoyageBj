@@ -192,7 +192,7 @@ export const CompanyDetailsPage: React.FC<Props> = ({ onNavigate, companyId, use
                                                 <button
                                                     onClick={() => {
                                                         if (user) {
-                                                            alert("Réservation confirmée ! (Simulation)");
+                                                            onNavigate('DASHBOARD_CLIENT', { bookingRouteId: route.id });
                                                         } else {
                                                             onNavigate('LOGIN_VOYAGEUR');
                                                         }

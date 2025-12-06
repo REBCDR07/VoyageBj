@@ -1,35 +1,133 @@
-# Architecture du Projet VoyageBj
+# 🏗 Architecture Technique - VoyageBj
 
-Ce document décrit la structure du projet après le refactoring. L'objectif est de séparer le code par fonctionnalité ("features") pour une meilleure maintenabilité.
+Ce document détaille l'architecture logicielle de la plateforme VoyageBj, ses choix techniques et sa structure modulaire.
 
-## Structure des Dossiers (`src/`)
+## 📐 Vue d'ensemble
 
-### `features/`
-Contient les modules fonctionnels de l'application. Chaque dossier correspond à un domaine métier ou un rôle utilisateur.
+L'application suit une architecture **Modulaire par Fonctionnalité (Feature-Based)**. Cela signifie que le code est organisé autour des domaines métier (Client, Compagnie, Admin) plutôt que par type de fichier (Components, Services, Utils).
 
-- **`auth/`** : Pages d'authentification (Login, Signup) pour tous les rôles.
-- **`public/`** : Pages accessibles publiquement (Landing Page, Recherche, Liste des compagnies).
-- **`client/`** : Tableau de bord et fonctionnalités pour les voyageurs (Clients).
-- **`company/`** : Tableau de bord et gestion pour les compagnies de transport.
-- **`admin/`** : Tableau de bord d'administration.
+```mermaid
+graph TD
+    subgraph "Core Layer"
+        APP[App.tsx]
+        ROUTER[React Router]
+    end
 
-### `shared/`
-Contient le code partagé utilisé par plusieurs features.
+    subgraph "Feature Layer"
+        AUTH[Auth Feature]
+        CLIENT[Client Feature]
+        COMPANY[Company Feature]
+        ADMIN[Admin Feature]
+        PUBLIC[Public Feature]
+    end
 
-- **`components/`** : Composants UI réutilisables (Navbar, Footer, NotificationSystem, etc.).
-- **`services/`** : Services d'accès aux données (ex: `storage.ts` pour le localStorage).
-- **`types/`** : Définitions de types TypeScript globaux (Interfaces User, Station, Reservation).
-- **`utils/`** : Fonctions utilitaires (ex: formatage de dates, helpers).
+    subgraph "Shared Layer"
+        UI[UI Components]
+        SERV[Services]
+        HOOKS[Hooks]
+        UTILS[Utils]
+    end
 
-### Racine `src/`
-- **`App.tsx`** : Composant principal qui gère le routage (React Router) et l'état global minimal (User session).
-- **`index.tsx`** : Point d'entrée de l'application React.
-- **`index.css`** : Styles globaux et configuration Tailwind.
+    APP --> ROUTER
+    ROUTER --> AUTH
+    ROUTER --> CLIENT
+    ROUTER --> COMPANY
+    ROUTER --> ADMIN
+    ROUTER --> PUBLIC
 
-## Routage
-Le projet utilise `react-router-dom`. Les routes sont définies dans `App.tsx`.
-La navigation se fait via le hook `useNavigate`.
+    AUTH --> SERV
+    CLIENT --> UI
+    CLIENT --> SERV
+    COMPANY --> UI
+    COMPANY --> SERV
+```
 
-## Flux de Données
-- L'état de l'utilisateur (`user`) est géré dans `App.tsx` et passé aux composants via des props (ou pourrait être migré vers un Context).
-- Les données sont persistées dans le `localStorage` via `shared/services/storage.ts`.
+---
+
+## 📂 Structure des Dossiers
+
+Voici l'arborescence détaillée du dossier `src/` :
+
+```bash
+src/
+├── features/                 # 📦 Modules Fonctionnels
+│   ├── admin/               # Espace Administrateur
+│   │   └── AdminDashboard.tsx
+│   ├── auth/                # Authentification (Login/Signup)
+│   │   ├── LoginVoyageur.tsx
+│   │   ├── SignupCompany.tsx
+│   │   └── ...
+│   ├── client/              # Espace Voyageur
+│   │   └── ClientDashboard.tsx
+│   ├── company/             # Espace Compagnie
+│   │   ├── CompanyDashboard.tsx
+│   │   └── StationManager.tsx
+│   └── public/              # Pages Publiques
+│       ├── LandingPage.tsx
+│       ├── SearchResultsPage.tsx
+│       └── CompaniesPage.tsx
+│
+├── shared/                  # 🤝 Code Partagé
+│   ├── components/          # Composants UI Réutilisables
+│   │   ├── Navbar.tsx
+│   │   ├── Ticket.tsx
+│   │   ├── SettingsModal.tsx
+│   │   └── ...
+│   ├── services/            # Logique Métier & API
+│   │   └── storage.ts       # Service de persistance (LocalStorage)
+│   ├── types/               # Définitions TypeScript
+│   │   └── index.ts
+│   └── utils/               # Fonctions Utilitaires
+│       └── imageUtils.ts
+│
+├── App.tsx                  # Composant Racine & Routing
+├── index.css                # Styles Globaux (Tailwind)
+└── main.tsx                 # Point d'entrée
+```
+
+---
+
+## 💾 Modèle de Données (Schema)
+
+Bien que l'application utilise `localStorage` pour le moment, les données sont structurées de manière relationnelle.
+
+```mermaid
+erDiagram
+    USER ||--o{ RESERVATION : makes
+    COMPANY ||--o{ STATION : owns
+    STATION ||--o{ RESERVATION : has
+    
+    USER {
+        string id
+        string role "ADMIN | COMPANY | CLIENT"
+        string email
+        string name
+        string status "PENDING | APPROVED"
+    }
+
+    STATION {
+        string id
+        string companyId
+        string type "STATION | ROUTE"
+        string location
+        number price
+    }
+
+    RESERVATION {
+        string id
+        string clientId
+        string stationId
+        string status "PENDING | COMPLETED"
+        string ticketClass
+    }
+```
+
+---
+
+## 🔄 Flux de Données
+
+1.  **Lecture** : Les composants appellent les services (`storage.ts`) pour récupérer les données.
+2.  **Écriture** : Les actions utilisateur déclenchent des mises à jour via les services, qui persistent les données dans le `localStorage`.
+3.  **Réactivité** : Les changements d'état locaux (`useState`) déclenchent le re-rendu des composants.
+
+> **Note** : Dans une future version avec Backend, les services `storage.ts` seront remplacés par des appels API (`fetch` ou `axios`), sans changer la structure des composants.

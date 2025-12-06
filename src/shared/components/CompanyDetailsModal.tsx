@@ -24,7 +24,7 @@ export const CompanyDetailsModal: React.FC<Props> = ({ isOpen, onClose, company 
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
             <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-scale-up">
-                {/* Header */}
+                {/* En-tête */}
                 <div className="relative h-40 bg-gray-900 shrink-0">
                     {company.bannerUrl ? (
                         <img src={company.bannerUrl} alt="Cover" className="w-full h-full object-cover opacity-60" />
@@ -44,8 +44,8 @@ export const CompanyDetailsModal: React.FC<Props> = ({ isOpen, onClose, company 
                             <h2 className="text-2xl font-bold leading-none">{company.companyName}</h2>
                             <div className="flex items-center gap-2 mt-2">
                                 <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide border ${company.status === 'APPROVED' ? 'bg-green-500/20 border-green-400 text-green-100' :
-                                        company.status === 'REJECTED' ? 'bg-red-500/20 border-red-400 text-red-100' :
-                                            'bg-yellow-500/20 border-yellow-400 text-yellow-100'
+                                    company.status === 'REJECTED' ? 'bg-red-500/20 border-red-400 text-red-100' :
+                                        'bg-yellow-500/20 border-yellow-400 text-yellow-100'
                                     }`}>
                                     {company.status === 'APPROVED' ? 'Validé' : company.status === 'REJECTED' ? 'Refusé' : 'En Attente'}
                                 </span>
@@ -54,10 +54,10 @@ export const CompanyDetailsModal: React.FC<Props> = ({ isOpen, onClose, company 
                     </div>
                 </div>
 
-                {/* Content */}
+                {/* Contenu */}
                 <div className="flex-1 overflow-y-auto p-8 pt-16">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                        {/* Company Info */}
+                        {/* Informations Entreprise */}
                         <div className="space-y-4">
                             <h3 className="text-lg font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
                                 <Building2 size={18} className="text-gray-400" /> Informations Entreprise
@@ -69,7 +69,7 @@ export const CompanyDetailsModal: React.FC<Props> = ({ isOpen, onClose, company 
                             </div>
                         </div>
 
-                        {/* Manager Info */}
+                        {/* Informations Responsable */}
                         <div className="space-y-4">
                             <h3 className="text-lg font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
                                 <CreditCard size={18} className="text-gray-400" /> Responsable & Contact
@@ -97,7 +97,7 @@ export const CompanyDetailsModal: React.FC<Props> = ({ isOpen, onClose, company 
                         </div>
                     </div>
 
-                    {/* Stations List */}
+                    {/* Liste des Stations */}
                     <div>
                         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <Bus size={18} className="text-gray-400" /> Stations & Trajets ({stations.length})

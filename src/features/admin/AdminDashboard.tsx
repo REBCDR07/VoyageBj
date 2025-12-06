@@ -9,6 +9,7 @@ import { NotifyFunc } from '../../App';
 import { DocumentViewerModal } from '../../shared/components/DocumentViewerModal';
 import { CompanyDetailsModal } from '../../shared/components/CompanyDetailsModal';
 import { BottomNav } from '../../shared/components/BottomNav';
+import { SettingsModal } from '../../shared/components/SettingsModal';
 
 interface Props {
     user: User;
@@ -19,7 +20,7 @@ interface Props {
 }
 
 export const AdminDashboard: React.FC<Props> = ({ user, notify, onNavigate, initialTab = 'dashboard', initialFilter = 'PENDING' }) => {
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'profile'>(initialTab);
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'profile' | 'settings'>(initialTab);
     const [companies, setCompanies] = useState<User[]>([]);
     const [filterStatus, setFilterStatus] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>(initialFilter);
     const [searchTerm, setSearchTerm] = useState('');
@@ -415,6 +416,14 @@ export const AdminDashboard: React.FC<Props> = ({ user, notify, onNavigate, init
                 onClose={() => setDetailsModal({ ...detailsModal, isOpen: false })}
                 company={companies.find(c => c.id === detailsModal.companyId) || null}
             />
+
+            {activeTab === 'settings' && (
+                <>
+                    {renderDashboard()}
+                    <SettingsModal onClose={() => setActiveTab('dashboard')} />
+                </>
+            )}
+
             <BottomNav user={user} activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
     );

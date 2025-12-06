@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, MapPin, User, Ticket, Truck, Users, HelpCircle, Shield, Briefcase } from 'lucide-react';
+import { LayoutDashboard, MapPin, User, Ticket, Truck, Users, HelpCircle, Shield, Briefcase, Settings } from 'lucide-react';
 import { User as UserType } from '../types';
 
 interface BottomNavProps {
@@ -38,7 +38,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ user, activeTab, onTabChan
                 { id: 'dashboard', label: 'Mon bord', icon: <LayoutDashboard /> },
                 { id: 'browse', label: 'Réserver', icon: <MapPin /> },
                 { id: 'tickets', label: 'Tickets', icon: <Ticket /> },
-                { id: 'profile', label: 'Profil', icon: <User /> },
+                { id: 'settings', label: 'Paramètres', icon: <Settings /> },
             ];
         }
 
@@ -47,8 +47,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ user, activeTab, onTabChan
                 { id: 'overview', label: 'Tableau', icon: <LayoutDashboard /> },
                 { id: 'stations', label: 'Stations', icon: <Truck /> },
                 { id: 'reservations', label: 'Réservations', icon: <Users /> },
-                { id: 'profile', label: 'Profil', icon: <User /> },
-                { id: 'contact', label: 'Admin', icon: <HelpCircle /> },
+                { id: 'settings', label: 'Paramètres', icon: <Settings /> },
             ];
         }
 
@@ -56,7 +55,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ user, activeTab, onTabChan
             return [
                 { id: 'dashboard', label: 'Tableau', icon: <Shield /> },
                 { id: 'profile', label: 'Profil', icon: <User /> },
-                // Add more admin tabs if needed based on AdminDashboard
+                { id: 'settings', label: 'Paramètres', icon: <Settings /> },
             ];
         }
 

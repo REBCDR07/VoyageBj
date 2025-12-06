@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { User, Station, Reservation, ViewState } from '../../shared/types';
 import { getStations, getReservations, createReservation, getUsers, saveUser } from '../../shared/services/storage';
 import {
@@ -14,6 +15,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { BottomNav } from '../../shared/components/BottomNav';
 import { Ticket } from '../../shared/components/Ticket';
+import { SettingsModal } from '../../shared/components/SettingsModal';
 
 interface Props {
     user: User;
@@ -22,7 +24,7 @@ interface Props {
 }
 
 export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) => {
-    const [view, setView] = useState<'dashboard' | 'browse' | 'company_profile' | 'profile' | 'tickets'>('dashboard');
+    const [view, setView] = useState<'dashboard' | 'browse' | 'company_profile' | 'profile' | 'tickets' | 'settings'>('dashboard');
     const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
     const [allStations, setAllStations] = useState<Station[]>([]);
     const [companies, setCompanies] = useState<User[]>([]);
@@ -35,9 +37,25 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
     const [viewingTicket, setViewingTicket] = useState<Reservation | null>(null);
     const ticketRef = useRef<HTMLDivElement>(null);
 
+    const location = useLocation();
+
     useEffect(() => {
         refreshData();
     }, [user.id]);
+
+    useEffect(() => {
+        // Check for booking redirect
+        const state = location.state as { bookingRouteId?: string } | null;
+        if (state?.bookingRouteId && allStations.length > 0) {
+            const route = allStations.find(s => s.id === state.bookingRouteId);
+            if (route) {
+                setBookingStation(route);
+                setBookingForm(prev => ({ ...prev, date: '', timeIndex: '', ticketClass: 'STANDARD' }));
+                // Clean up state to prevent reopening on refresh (optional but good practice)
+                window.history.replaceState({}, document.title);
+            }
+        }
+    }, [location.state, allStations]);
 
     useEffect(() => {
         // Défiler vers le haut lors du changement de vue
@@ -556,12 +574,14 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
                                             ))}
                                             {station.workDays.length > 5 && <span className="text-xs text-gray-400 self-center font-medium">...</span>}
                                         </div>
-                                        <button
-                                            onClick={() => { setBookingStation(station); setBookingForm({ ...bookingForm, date: '', timeIndex: '', ticketClass: 'STANDARD' }); }}
-                                            className="w-full sm:w-auto px-8 py-3 bg-[#008751] text-white rounded-xl font-bold hover:bg-[#006b40] shadow-lg shadow-green-200 hover:shadow-green-300 transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
-                                        >
-                                            Réserver <ArrowRight size={18} />
-                                        </button>
+                                        {station.type === 'ROUTE' && (
+                                            <button
+                                                onClick={() => { setBookingStation(station); setBookingForm({ ...bookingForm, date: '', timeIndex: '', ticketClass: 'STANDARD' }); }}
+                                                className="w-full sm:w-auto px-8 py-3 bg-[#008751] text-white rounded-xl font-bold hover:bg-[#006b40] shadow-lg shadow-green-200 hover:shadow-green-300 transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                                            >
+                                                Réserver <ArrowRight size={18} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -681,7 +701,9 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
                     <div className="w-9 h-9 bg-[#008751] rounded-xl flex items-center justify-center text-white shadow-md shadow-green-200">
                         <Bus size={18} />
                     </div>
-                    <h1 className="font-black text-xl text-gray-900 tracking-tight">VoyageBj</h1>
+                    <h1 className="font-black text-2xl tracking-tight" style={{ fontFamily: '"Dancing Script", cursive' }}>
+                        <span className="text-[#008751]">Voyage</span><span className="text-[#FCD116]">B</span><span className="text-[#E8112D]">j</span>
+                    </h1>
                 </div>
                 <button onClick={() => setView('profile')} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
                     {user.avatarUrl ? (
@@ -699,6 +721,12 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
                 {view === 'company_profile' && renderCompanyProfile()}
                 {view === 'profile' && renderProfile()}
                 {view === 'tickets' && renderTickets()}
+                {view === 'settings' && (
+                    <>
+                        {renderDashboard()}
+                        <SettingsModal onClose={() => setView('dashboard')} />
+                    </>
+                )}
             </main>
 
             {/* Navigation inférieure */}

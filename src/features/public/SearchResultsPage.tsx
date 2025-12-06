@@ -35,13 +35,33 @@ export const SearchResultsPage: React.FC<Props> = ({ onNavigate, searchParams, u
             const parentStations = approvedStations.filter(s => s.type === 'STATION');
             const allRoutes = approvedStations.filter(s => s.type === 'ROUTE');
 
-            // Filter stations by location if search params exist
+            // Filter stations logic
             let filteredStations = parentStations;
+
             if (departure || arrival) {
-                filteredStations = parentStations.filter(s => {
-                    const matchDep = !departure || s.location.toLowerCase().includes(departure.toLowerCase());
-                    const matchArr = !arrival || s.location.toLowerCase().includes(arrival.toLowerCase());
-                    return matchDep || matchArr;
+                filteredStations = parentStations.filter(station => {
+                    // 1. Check if station matches departure location
+                    const matchStationLoc = !departure || station.location.toLowerCase().includes(departure.toLowerCase());
+
+                    if (!arrival) {
+                        // If only departure is specified, show stations matching location
+                        return matchStationLoc;
+                    } else {
+                        // If arrival is specified, we must check if this station has any route matching the criteria
+                        // Find routes for this station
+                        const stationRoutes = allRoutes.filter(r => r.parentId === station.id);
+
+                        // Check if any route matches both departure (optional check on route point A) and arrival
+                        const hasMatchingRoute = stationRoutes.some(route => {
+                            const matchRouteDep = !departure || route.pointA?.toLowerCase().includes(departure.toLowerCase());
+                            const matchRouteArr = route.pointB?.toLowerCase().includes(arrival.toLowerCase());
+                            return matchRouteDep && matchRouteArr;
+                        });
+
+                        // If we are searching for a specific trip (Dep -> Arr), we only care about routes.
+                        // However, the user might want to see the station if it's in the departure city AND has routes to arrival.
+                        return matchStationLoc && hasMatchingRoute;
+                    }
                 });
             }
 
@@ -59,7 +79,7 @@ export const SearchResultsPage: React.FC<Props> = ({ onNavigate, searchParams, u
     const handleBooking = (routeId: string) => {
         if (user) {
             // User is logged in, proceed to booking (mock)
-            alert("Réservation confirmée ! (Simulation)");
+            onNavigate('DASHBOARD_CLIENT', { bookingRouteId: routeId });
         } else {
             // User not logged in, redirect to login
             onNavigate('LOGIN_VOYAGEUR');
@@ -267,7 +287,7 @@ export const SearchResultsPage: React.FC<Props> = ({ onNavigate, searchParams, u
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans flex flex-col pt-[70px] selection:bg-green-100 selection:text-green-900">
+        <div className="min-h-screen bg-gray-50 font-sans flex flex-col selection:bg-green-100 selection:text-green-900">
             <div className="bg-[#008751] relative overflow-hidden text-white py-10 md:py-16 shadow-lg">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                 <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4"></div>

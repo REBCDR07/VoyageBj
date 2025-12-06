@@ -90,7 +90,7 @@ const AppContent = () => {
             case 'LOGIN_ADMIN': navigate('/login/admin'); break;
             case 'DASHBOARD_ADMIN': navigate('/admin/dashboard'); break;
             case 'DASHBOARD_COMPANY': navigate('/company/dashboard'); break;
-            case 'DASHBOARD_CLIENT': navigate('/client/dashboard'); break;
+            case 'DASHBOARD_CLIENT': navigate('/client/dashboard', { state: params }); break;
             case 'COMPANIES_LIST': navigate('/companies'); break;
             case 'COMPANIES': navigate('/companies-all'); break; // Assuming CompaniesPage is different
             case 'COMPANY_DETAILS': navigate(`/company/${params?.companyId}`); break;
@@ -157,7 +157,7 @@ const AppContent = () => {
                 </Routes>
             </main>
 
-            <Footer onNavigate={handleNavigate} />
+            {location.pathname === '/' && <Footer onNavigate={handleNavigate} />}
         </div>
     );
 };

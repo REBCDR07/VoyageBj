@@ -21,11 +21,11 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
     const [showPwd, setShowPwd] = useState(false);
     const [showConfirmPwd, setShowConfirmPwd] = useState(false);
 
-    // Progressive validation: check if field is unlocked
+    // Progression de validation à l'inscription d'une compagnie: avec blocage du input suivant si le précédent n'est pas renseigné
     const isFieldUnlocked = (fieldName: string): boolean => {
         const fieldOrder = ['name', 'email', 'password', 'confirmPassword', 'companyName', 'ifu', 'rccm', 'whatsapp', 'location', 'phone', 'npi'];
         const currentIndex = fieldOrder.indexOf(fieldName);
-        if (currentIndex === 0) return true; // First field always unlocked
+        if (currentIndex === 0) return true; 
 
         // Check if all previous fields are filled
         for (let i = 0; i < currentIndex; i++) {
@@ -41,12 +41,12 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
         e.preventDefault();
         if (form.password !== form.confirmPassword) return notify('Mots de passe différents.', 'error');
 
-        // Validation: all fields required
+        // Validation: tous les champs sont obligatoires
         if (!form.companyName || !form.name || !form.phone || !form.npi || !form.ifu || !form.rccm ||
             !form.email || !form.password || !form.whatsapp || !form.location) {
             return notify("Tous les champs sont obligatoires.", "error");
         }
-        if (!form.anattUrl) return notify("L'attestation ANaTT est obligatoire.", "error");
+        if (!form.anattUrl) return notify("L'attestation ANaTT est obligatoire à la soumission de votre dossier d'inscription.", "error");
 
         const newUser: User = {
             id: crypto.randomUUID(),
@@ -75,7 +75,7 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
             setUser(null);
             setTimeout(() => {
                 onNavigate('LANDING');
-            }, 2000);
+            }, 6000);
         }
         catch (err: any) { notify("Erreur inscription.", "error"); }
     };
@@ -120,7 +120,8 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
         <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-amber-50 via-emerald-50 to-red-50">
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 w-full max-w-lg shadow-lg">
                 <form className="w-full flex flex-col items-center text-center" onSubmit={handleRegister}>
-                    <h2 className="text-3xl font-extrabold text-gray-800 mb-2 font-heading">Nouveau Partenaire</h2>
+                    <h1 className="text-3xl font-extrabold text-gray-800 mb-2 font-heading">Bienvenue à VoyageBj</h1>
+                    <h2 className="text-3xl font-extrabold text-gray-800 mb-2 font-heading">Enregistrer ma compagnie</h2>
                     <div className="flex gap-1 mb-6">
                         {[1, 2, 3, 4].map(n => (<div key={n} className={`h-1.5 w-8 rounded-full transition-colors duration-300 ${n <= step ? 'bg-[#e9b400]' : 'bg-gray-300'}`}></div>))}
                     </div>
@@ -139,7 +140,7 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
                                 </label>
                             </div>
 
-                            {/* Progressive fields */}
+                            {/* Progression lors de l'inscription */}
                             <div className="relative w-full">
                                 <input className="neu-input" type="text" placeholder="Nom du Gérant *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
                                 {!isFieldUnlocked('name') && <Lock className="absolute right-3 top-3 text-gray-400" size={16} />}
@@ -174,12 +175,12 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
                             </div>
 
                             <div className="relative w-full">
-                                <input className="neu-input" type="text" placeholder="Numéro IFU *" value={form.ifu} onChange={(e) => setForm({ ...form, ifu: e.target.value })} required disabled={!isFieldUnlocked('ifu')} />
+                                <input className="neu-input" type="text" placeholder="L'IFU de la Compagnie*" value={form.ifu} onChange={(e) => setForm({ ...form, ifu: e.target.value })} required disabled={!isFieldUnlocked('ifu')} />
                                 {!isFieldUnlocked('ifu') && <Lock className="absolute right-3 top-3 text-gray-400" size={16} />}
                             </div>
 
                             <div className="relative w-full">
-                                <input className="neu-input" type="text" placeholder="Numéro RCCM *" value={form.rccm} onChange={(e) => setForm({ ...form, rccm: e.target.value })} required disabled={!isFieldUnlocked('rccm')} />
+                                <input className="neu-input" type="text" placeholder="Le numéro RCCM de la Compagnie*" value={form.rccm} onChange={(e) => setForm({ ...form, rccm: e.target.value })} required disabled={!isFieldUnlocked('rccm')} />
                                 {!isFieldUnlocked('rccm') && <Lock className="absolute right-3 top-3 text-gray-400" size={16} />}
                             </div>
                         </div>
@@ -191,7 +192,7 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
 
                             <div className="relative w-full">
                                 <Phone className="absolute left-3 top-3 text-gray-400" size={16} />
-                                <input className="neu-input pl-10" type="tel" placeholder="WhatsApp *" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} required disabled={!isFieldUnlocked('whatsapp')} />
+                                <input className="neu-input pl-10" type="tel" placeholder="Renseignez votre contact WhatsApp *" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} required disabled={!isFieldUnlocked('whatsapp')} />
                                 {!isFieldUnlocked('whatsapp') && <Lock className="absolute right-3 top-3 text-gray-400" size={16} />}
                             </div>
 
@@ -203,12 +204,12 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
 
                             <div className="relative w-full">
                                 <Phone className="absolute left-3 top-3 text-gray-400" size={16} />
-                                <input className="neu-input pl-10" type="tel" placeholder="Téléphone Pro *" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required disabled={!isFieldUnlocked('phone')} />
+                                <input className="neu-input pl-10" type="tel" placeholder="Téléphone *" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required disabled={!isFieldUnlocked('phone')} />
                                 {!isFieldUnlocked('phone') && <Lock className="absolute right-3 top-3 text-gray-400" size={16} />}
                             </div>
 
                             <div className="relative w-full">
-                                <input className="neu-input" type="text" placeholder="NPI Gérant *" value={form.npi} onChange={(e) => setForm({ ...form, npi: e.target.value })} required disabled={!isFieldUnlocked('npi')} />
+                                <input className="neu-input" type="text" placeholder="L'NPI du gérant *" value={form.npi} onChange={(e) => setForm({ ...form, npi: e.target.value })} required disabled={!isFieldUnlocked('npi')} />
                                 {!isFieldUnlocked('npi') && <Lock className="absolute right-3 top-3 text-gray-400" size={16} />}
                             </div>
                         </div>
@@ -259,7 +260,7 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
                     </div>
 
                     <div className="mt-6 flex flex-col gap-2">
-                        <button type="button" onClick={() => onNavigate('LOGIN_COMPANY')} className="text-sm font-bold text-[#e9b400] hover:underline">Déjà partenaire ? Connexion</button>
+                        <button type="button" onClick={() => onNavigate('LOGIN_COMPANY')} className="text-sm font-bold text-[#e9b400] hover:underline">Déjà enregistré ? Connectez-vous ici</button>
                         <button type="button" onClick={() => onNavigate('LANDING')} className="text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1 transition-colors"><ArrowLeft size={12} /> Retour à l'accueil</button>
                     </div>
                 </form>
@@ -267,3 +268,5 @@ export const SignupCompany: React.FC<Props> = ({ onNavigate, notify, setUser }) 
         </div>
     );
 };
+
+

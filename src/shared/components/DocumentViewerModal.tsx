@@ -17,7 +17,7 @@ export const DocumentViewerModal: React.FC<Props> = ({ isOpen, onClose, document
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
             <div className="bg-white rounded-2xl w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-scale-up">
-                {/* Header */}
+                {/* En-tête */}
                 <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white z-10">
                     <div className="flex items-center gap-3">
                         <div className="bg-gray-100 p-2 rounded-lg text-gray-600">
@@ -44,7 +44,7 @@ export const DocumentViewerModal: React.FC<Props> = ({ isOpen, onClose, document
                     </div>
                 </div>
 
-                {/* Content */}
+                {/* Contenu */}
                 <div className="flex-1 bg-gray-100 relative overflow-hidden flex items-center justify-center p-4">
                     {documentType === 'PDF' ? (
                         <iframe
@@ -61,7 +61,7 @@ export const DocumentViewerModal: React.FC<Props> = ({ isOpen, onClose, document
                     )}
                 </div>
 
-                {/* Footer Actions */}
+                {/* Actions de Pied de Page */}
                 <div className="p-4 border-t border-gray-100 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
                     <a
                         href={documentUrl}

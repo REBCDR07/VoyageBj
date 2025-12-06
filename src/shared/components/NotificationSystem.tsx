@@ -44,7 +44,7 @@ export const NotificationSystem: React.FC<NotificationSystemProps> = ({ notifica
 
   return (
     <>
-      {/* Zone Centrale (Success) */}
+      {/* Zone Centrale (Succès) */}
       <div className="pointer-events-none fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-2 p-4">
         {visibleCenter.map((notification) => (
           <NotificationCard
@@ -55,7 +55,7 @@ export const NotificationSystem: React.FC<NotificationSystemProps> = ({ notifica
         ))}
       </div>
 
-      {/* Zone Coin Bas-Droit (Danger, Warning, Info, Message) */}
+      {/* Zone Coin Bas-Droit (Danger, Avertissement, Info, Message) */}
       <div className="pointer-events-none fixed inset-x-0 top-0 z-[9999] flex flex-col items-center gap-2 p-4 md:items-end md:top-auto md:bottom-0 md:right-0 md:max-w-sm">
         {visibleCorner.map((notification) => (
           <NotificationCard

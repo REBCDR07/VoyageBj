@@ -41,8 +41,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </div>
         </div>
         <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center">
-          <p>© 2024 VoyageBj. Tous droits réservés.</p>
-          <p className="mt-2 md:mt-0">Fait avec ❤️ au Bénin.</p>
+          <p>© 2025 VoyageBj</p>
         </div>
       </div>
     </footer>

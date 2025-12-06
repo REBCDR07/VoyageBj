@@ -7,7 +7,7 @@ const STORAGE_KEYS = {
   CURRENT_USER: 'vb_current_user'
 };
 
-// --- Helper for Safe Parsing ---
+// --- Utilitaire pour l'analyse sécurisée ---
 const safeParse = <T>(key: string, fallback: T): T => {
   const item = localStorage.getItem(key);
   if (!item) return fallback;
@@ -22,20 +22,20 @@ const safeParse = <T>(key: string, fallback: T): T => {
   }
 };
 
-// --- Helper for Safe Saving ---
+// --- Utilitaire pour la sauvegarde sécurisée ---
 const safeSave = (key: string, data: any) => {
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch (error: any) {
     console.error(`Storage save failed for "${key}"`, error);
     if (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-      // Attempt to free space by clearing the specific key if it's users data
+      // Tenter de libérer de l'espace en effaçant la clé spécifique s'il s'agit des données utilisateurs
       if (key === STORAGE_KEYS.USERS) {
         console.warn('Quota exceeded for users storage. Clearing existing users and retrying.');
         try {
           localStorage.removeItem(key);
           localStorage.setItem(key, JSON.stringify(data));
-          return; // Success!
+          return; // Succès !
         } catch (retryError) {
           console.error('Retry failed after clearing storage.', retryError);
           throw new Error('Espace de stockage plein même après nettoyage.');
@@ -48,11 +48,11 @@ const safeSave = (key: string, data: any) => {
   }
 };
 
-// --- Helper to seed data if empty ---
+// --- Utilitaire pour initialiser les données si vides ---
 const seedData = () => {
   if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
     const users: User[] = [
-      // Admin
+      // Administrateur
       {
         id: 'admin',
         name: 'Administrateur',
@@ -60,7 +60,7 @@ const seedData = () => {
         role: UserRole.ADMIN,
         description: ''
       },
-      // Approved Company
+      // Compagnie Approuvée
       {
         id: 'comp1',
         name: 'Paul Manager',
@@ -77,7 +77,7 @@ const seedData = () => {
         phone: '97000001',
         description: ''
       },
-      // Pending Company
+      // Compagnie En Attente
       {
         id: 'comp2',
         name: 'Jean Directeur',
@@ -118,7 +118,7 @@ const seedData = () => {
 
 seedData();
 
-// --- Storage API ---
+// --- API de Stockage ---
 
 export const getStations = (): Station[] => {
   return safeParse<Station[]>(STORAGE_KEYS.STATIONS, []);
@@ -172,7 +172,7 @@ export const saveUser = (user: User) => {
   else users.push(user);
   safeSave(STORAGE_KEYS.USERS, users);
 
-  // Update session if it's self
+  // Mettre à jour la session si c'est soi-même
   const currentUser = getCurrentUser();
   if (currentUser && currentUser.id === user.id) {
     safeSave(STORAGE_KEYS.CURRENT_USER, user);
@@ -191,10 +191,10 @@ export const setCurrentUser = (user: User | null) => {
   }
 };
 
-// --- Description Generation (Removed AI dependency) ---
+// --- Génération de Description (Dépendance IA supprimée) ---
 
 export const generateStationDescription = async (stationData: Partial<Station>): Promise<string> => {
-  // AI dependency removed - returning empty string
-  // Use the local description templates in services/description.tsx instead
+  // Dépendance IA supprimée - retour d'une chaîne vide
+  // Utilisez plutôt les modèles de description locaux dans services/description.tsx
   return "";
 };
