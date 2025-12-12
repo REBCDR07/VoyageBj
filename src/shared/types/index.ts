@@ -45,6 +45,8 @@ export interface Station {
   photoUrl: string;
   location: string; // Ville/Zone
   mapLink?: string; // Lien Google Maps
+  mapLinkA?: string; // Lien Google Maps du point de départ (Pour Route)
+  mapLinkB?: string; // Lien Google Maps du point d'arrivée (Pour Route)
   description?: string;
 
   // Horaires d'ouverture (Pour Station)

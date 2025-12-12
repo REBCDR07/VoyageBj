@@ -63,17 +63,11 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
   };
 
   const handleEdit = (id: string) => {
-    setEditStationId(id);
-    if (setStationManagerProps) setStationManagerProps({ initialType: 'STATION' });
-    onNavigate('STATION_MANAGER');
+    onNavigate('STATION_MANAGER', { editId: id, initialType: 'STATION' });
   };
 
   const handleCreate = (type: 'STATION' | 'ROUTE', parentId?: string) => {
-    setEditStationId(null);
-    if (setStationManagerProps) {
-      setStationManagerProps({ initialType: type, parentId });
-    }
-    onNavigate('STATION_MANAGER');
+    onNavigate('STATION_MANAGER', { initialType: type, parentId });
   };
 
   const handleUpdateProfile = (e: React.FormEvent) => {
