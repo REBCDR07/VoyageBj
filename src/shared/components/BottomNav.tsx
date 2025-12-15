@@ -16,11 +16,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ user, activeTab, onTabChan
             <button
                 key={id}
                 onClick={() => onTabChange(id)}
-                className={`flex flex-col items-center justify-center w-full py-2 transition-all duration-300 ${isActive ? 'text-[#008751] -translate-y-1' : 'text-gray-400 hover:text-gray-600'}`}
+                className={`flex flex-col items-center justify-center w-full py-1 transition-all duration-300 ${isActive ? 'text-[#008751] -translate-y-0.5' : 'text-gray-400 hover:text-gray-600'}`}
             >
-                <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? 'bg-green-50 shadow-sm' : 'bg-transparent'}`}>
+                <div className={`p-1 rounded-xl transition-all duration-300 ${isActive ? 'bg-green-50 shadow-sm' : 'bg-transparent'}`}>
                     {React.cloneElement(icon as React.ReactElement<any>, {
-                        size: 24,
+                        size: 20,
                         strokeWidth: isActive ? 2.5 : 2,
                         className: 'transition-all duration-300'
                     })}

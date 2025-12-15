@@ -66,7 +66,7 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
             companyName: user.companyName || 'Agence',
             type: station.type || 'STATION',
             name: station.name || (station.type === 'ROUTE' ? `${station.pointA} - ${station.pointB}` : 'Nouvelle Station'),
-            photoUrl: station.photoUrl || `https://picsum.photos/seed/${Math.random()}/400/300`,
+            photoUrl: station.photoUrl || '',
             location: station.location || '',
             mapLink: station.mapLink,
             mapLinkA: station.mapLinkA,
@@ -108,8 +108,8 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
     const handleStationImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            if (file.size > 1024 * 700) {
-                notify("Fichier trop volumineux (Max 700Ko).", "error");
+            if (file.size > 1024 * 1024 * 5) { // 5MB limit
+                notify("Fichier trop volumineux (Max 5Mo).", "error");
                 return;
             }
             const reader = new FileReader();
@@ -117,6 +117,7 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
                 setStation(prev => ({ ...prev, photoUrl: reader.result as string }));
             };
             reader.readAsDataURL(file);
+            e.target.value = ''; // Reset input to allow re-upload
         }
     };
 
@@ -154,17 +155,35 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
                                 <label className={labelClass}>Photo de la Station</label>
                                 <div className="relative group cursor-pointer overflow-hidden rounded-lg border-2 border-dashed border-gray-300 hover:border-[#008751] transition-colors bg-white h-32 flex items-center justify-center">
                                     {station.photoUrl ? (
-                                        <img src={station.photoUrl} className="w-full h-full object-cover" />
+                                        <div className="relative w-full h-full">
+                                            <img src={station.photoUrl} className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs">
+                                                <Camera size={16} className="mr-1" /> Modifier
+                                            </div>
+                                        </div>
                                     ) : (
-                                        <div className="text-center text-gray-400">
-                                            <ImageIcon size={24} className="mx-auto mb-1 opacity-50" />
-                                            <span className="text-xs">Ajouter</span>
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-center p-2">
+                                            {station.name ? (
+                                                <div className="w-full h-full bg-[#008751]/10 flex items-center justify-center text-[#008751] font-black text-3xl uppercase">
+                                                    {station.name.substring(0, 2)}
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <ImageIcon size={24} className="mx-auto mb-1 opacity-50 text-gray-400" />
+                                                    <span className="text-[10px] text-gray-500 font-medium">Glisser ou cliquer</span>
+                                                </>
+                                            )}
                                         </div>
                                     )}
-                                    <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleStationImageUpload} />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs">
-                                        <Camera size={16} className="mr-1" /> Photo
-                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                        onChange={handleStationImageUpload}
+                                        onDragOver={(e) => { e.preventDefault(); e.currentTarget.parentElement?.classList.add('border-[#008751]', 'bg-green-50'); }}
+                                        onDragLeave={(e) => { e.currentTarget.parentElement?.classList.remove('border-[#008751]', 'bg-green-50'); }}
+                                        onDrop={(e) => { e.currentTarget.parentElement?.classList.remove('border-[#008751]', 'bg-green-50'); }}
+                                    />
                                 </div>
                             </div>
 
@@ -195,14 +214,6 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
                                 <div className="relative">
                                     <Clock className="absolute left-2 top-2.5 text-gray-400" size={14} />
                                     <input type="time" className={`${inputClass} pl-8`} value={station.closingTime || ''} onChange={e => setStation({ ...station, closingTime: e.target.value })} />
-                                </div>
-                            </div>
-
-                            <div className="col-span-12 md:col-span-6">
-                                <label className={labelClass}>Lien Google Maps (Optionnel)</label>
-                                <div className="relative">
-                                    <LinkIcon className="absolute left-2 top-2.5 text-gray-400" size={14} />
-                                    <input type="url" className={`${inputClass} pl-8`} value={station.mapLink || ''} onChange={e => setStation({ ...station, mapLink: e.target.value })} placeholder="https://maps.google.com/..." />
                                 </div>
                             </div>
 
@@ -240,17 +251,35 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
                                 <label className={labelClass}>Photo du Bus</label>
                                 <div className="relative group cursor-pointer overflow-hidden rounded-lg border-2 border-dashed border-gray-300 hover:border-[#e9b400] transition-colors bg-white h-32 flex items-center justify-center">
                                     {station.photoUrl ? (
-                                        <img src={station.photoUrl} className="w-full h-full object-cover" />
+                                        <div className="relative w-full h-full">
+                                            <img src={station.photoUrl} className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs">
+                                                <Camera size={16} className="mr-1" /> Modifier
+                                            </div>
+                                        </div>
                                     ) : (
-                                        <div className="text-center text-gray-400">
-                                            <ImageIcon size={24} className="mx-auto mb-1 opacity-50" />
-                                            <span className="text-xs">Ajouter</span>
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-center p-2">
+                                            {station.pointA && station.pointB ? (
+                                                <div className="w-full h-full bg-[#e9b400]/10 flex items-center justify-center text-[#e9b400] font-black text-xl uppercase gap-1">
+                                                    {station.pointA.substring(0, 2)}<span className="text-gray-300">-</span>{station.pointB.substring(0, 2)}
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <ImageIcon size={24} className="mx-auto mb-1 opacity-50 text-gray-400" />
+                                                    <span className="text-[10px] text-gray-500 font-medium">Glisser ou cliquer</span>
+                                                </>
+                                            )}
                                         </div>
                                     )}
-                                    <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleStationImageUpload} />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs">
-                                        <Camera size={16} className="mr-1" /> Photo
-                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                        onChange={handleStationImageUpload}
+                                        onDragOver={(e) => { e.preventDefault(); e.currentTarget.parentElement?.classList.add('border-[#e9b400]', 'bg-yellow-50'); }}
+                                        onDragLeave={(e) => { e.currentTarget.parentElement?.classList.remove('border-[#e9b400]', 'bg-yellow-50'); }}
+                                        onDrop={(e) => { e.currentTarget.parentElement?.classList.remove('border-[#e9b400]', 'bg-yellow-50'); }}
+                                    />
                                 </div>
                             </div>
 
@@ -267,24 +296,6 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
                             <div className="col-span-12 md:col-span-3">
                                 <label className={labelClass}>Prix Standard (FCFA)</label>
                                 <input type="number" required className={`${inputClass} font-bold text-[#008751]`} value={station.price || ''} onChange={e => setStation({ ...station, price: Number(e.target.value) })} />
-                            </div>
-
-                            <div className="col-span-12 md:col-span-3">
-                                <label className={labelClass}>Lien Maps Point A</label>
-                                <div className="relative">
-                                    <LinkIcon className="absolute left-2 top-2.5 text-gray-400" size={14} />
-                                    <input type="url" className={`${inputClass} pl-8`} value={station.mapLinkA || ''} onChange={e => setStation({ ...station, mapLinkA: e.target.value })} placeholder="https://maps.google.com/..." />
-                                </div>
-                                <p className="text-[10px] text-gray-400 mt-0.5">Pour suivi en direct (optionnel)</p>
-                            </div>
-
-                            <div className="col-span-12 md:col-span-3">
-                                <label className={labelClass}>Lien Maps Point B</label>
-                                <div className="relative">
-                                    <LinkIcon className="absolute left-2 top-2.5 text-gray-400" size={14} />
-                                    <input type="url" className={`${inputClass} pl-8`} value={station.mapLinkB || ''} onChange={e => setStation({ ...station, mapLinkB: e.target.value })} placeholder="https://maps.google.com/..." />
-                                </div>
-                                <p className="text-[10px] text-gray-400 mt-0.5">Pour suivi en direct (optionnel)</p>
                             </div>
 
                             <datalist id="cities_list">

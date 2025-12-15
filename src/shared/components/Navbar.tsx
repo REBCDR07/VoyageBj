@@ -63,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onNavigate, onLogout }) =>
                         <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
                             {/* Bouton Accueil (Visible sur toutes les tailles, raffiné) */}
                             <button
-                                onClick={() => onNavigate(user?.role === 'CLIENT' ? 'COMPANIES_LIST' : 'LANDING')}
+                                onClick={() => onNavigate('LANDING')}
                                 className="p-2.5 text-gray-400 hover:text-[#008751] hover:bg-gray-50 rounded-xl transition-all active:scale-95 hidden sm:block"
                                 title="Retour à l'accueil"
                             >

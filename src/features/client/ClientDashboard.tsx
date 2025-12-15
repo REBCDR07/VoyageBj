@@ -672,7 +672,8 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
             price: viewingTicket.pricePaid,
             currency: 'FCFA',
             companyName: company?.companyName || 'VoyageBj',
-            ticketClass: viewingTicket.ticketClass
+            ticketClass: viewingTicket.ticketClass,
+            status: viewingTicket.status
         };
 
         return (
@@ -688,6 +689,11 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
                     </button>
 
                     <Ticket data={ticketData} />
+                    <div className="mt-4 flex justify-center">
+                        <button onClick={() => setViewingTicket(null)} className="px-6 py-2 bg-white/20 text-white rounded-full font-bold backdrop-blur-sm border border-white/20 hover:bg-white/30 transition-colors">
+                            Fermer
+                        </button>
+                    </div>
                 </div>
             </div>
         );
@@ -736,7 +742,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
             {/* Modal de réservation */}
             {
                 bookingStation && (
-                    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-end md:items-center justify-center z-[50] p-0 md:p-4 animate-fade-in">
+                    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-end md:items-center justify-center z-[2000] p-0 md:p-4 animate-fade-in">
                         <div className="bg-white w-full max-w-lg md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] md:max-h-[90vh] animate-slide-up-mobile md:animate-scale-up">
 
                             {/* En-tête Modal */}

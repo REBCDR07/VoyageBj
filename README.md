@@ -51,9 +51,9 @@ Le design system est ancré dans l'identité nationale :
 
 | Module | Fonctionnalités |
 | :--- | :--- |
-| **👤 Espace Voyageur** | • Recherche intelligente (Ville, Date, Compagnie)<br>• Sélection de siège visuelle<br>• Billets QR Code (PDF/PNG)<br>• Historique |
-| **🏢 Espace Compagnie** | • Dashboard Analytique (Analytiques des réservations, Taux de remplissage)<br>• Gestion des Gares & Trajets<br>• Validation des embarquements (Scan QR)<br>• Rapports financiers exportables |
-| **🛡️ Espace Admin** | • KYC Compagnies (Vérification IFU, RCCM)<br>• Supervision du trafic en temps réel<br>• Gestion des utilisateurs & Rôles<br>• Audit logs |
+| **👤 Espace Voyageur** | • Recherche intelligente & Feed 3D interactif<br>• Sélection de siège visuelle<br>• Billets QR Code (PDF/PNG) avec design "Arrivée"<br>• Historique & Téléchargement simplifié |
+| **🏢 Espace Compagnie** | • Dashboard Analytique (Vues Stations/Trajets)<br>• Création intuitive (Upload Drag & Drop + Fallback initiaux)<br>• Validation des embarquements (Scan QR)<br>• Gestion de flotte & Horaires |
+| **🛡️ Espace Admin** | • KYC Compagnies (Vérification IFU, RCCM)<br>• Supervision du trafic & Notifications (Sonner)<br>• Gestion des utilisateurs & Rôles<br>• Audit logs |
 
 ---
 
