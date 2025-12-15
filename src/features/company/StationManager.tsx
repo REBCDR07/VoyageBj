@@ -69,6 +69,8 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
             photoUrl: station.photoUrl || `https://picsum.photos/seed/${Math.random()}/400/300`,
             location: station.location || '',
             mapLink: station.mapLink,
+            mapLinkA: station.mapLinkA,
+            mapLinkB: station.mapLinkB,
             description: station.description || '',
             openingTime: station.openingTime,
             closingTime: station.closingTime,
@@ -127,12 +129,12 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
                 <div>
                     <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                         {station.type === 'STATION' ? <MapPin className="text-[#008751]" size={20} /> : <MapPin className="text-[#e9b400]" size={20} />}
-                        {station.id ? 'Modifier ' : 'Créer '} 
+                        {station.id ? 'Modifier ' : 'Créer '}
                         {station.type === 'STATION' ? 'Sous-Station' : 'Parcours'}
                     </h2>
                     <p className="text-gray-500 text-xs">
-                        {station.type === 'STATION' 
-                            ? 'Configurez le profil de votre point de présence.' 
+                        {station.type === 'STATION'
+                            ? 'Configurez le profil de votre point de présence.'
                             : 'Définissez les détails du voyage (prix, horaires).'}
                     </p>
                 </div>
@@ -143,7 +145,7 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
 
             <div className="overflow-y-auto p-6 custom-scrollbar">
                 <form onSubmit={handleSaveStation} className="space-y-6">
-                    
+
                     {/* --- STATION MODE LAYOUT --- */}
                     {station.type === 'STATION' && (
                         <div className="grid grid-cols-12 gap-4">
@@ -209,7 +211,7 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
                                 <label className={labelClass}>Jours d'Ouverture</label>
                                 <div className="flex flex-wrap gap-2">
                                     {MOCK_DAYS.map(day => (
-                                        <button key={day} type="button" onClick={() => { const days = station.workDays || []; const newDays = days.includes(day) ? days.filter(d => d !== day) : [...days, day]; setStation({ ...station, workDays: newDays }); }} 
+                                        <button key={day} type="button" onClick={() => { const days = station.workDays || []; const newDays = days.includes(day) ? days.filter(d => d !== day) : [...days, day]; setStation({ ...station, workDays: newDays }); }}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${station.workDays?.includes(day) ? 'bg-[#008751] text-white border-[#008751] shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}>
                                             {day}
                                         </button>
@@ -267,6 +269,24 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
                                 <input type="number" required className={`${inputClass} font-bold text-[#008751]`} value={station.price || ''} onChange={e => setStation({ ...station, price: Number(e.target.value) })} />
                             </div>
 
+                            <div className="col-span-12 md:col-span-3">
+                                <label className={labelClass}>Lien Maps Point A</label>
+                                <div className="relative">
+                                    <LinkIcon className="absolute left-2 top-2.5 text-gray-400" size={14} />
+                                    <input type="url" className={`${inputClass} pl-8`} value={station.mapLinkA || ''} onChange={e => setStation({ ...station, mapLinkA: e.target.value })} placeholder="https://maps.google.com/..." />
+                                </div>
+                                <p className="text-[10px] text-gray-400 mt-0.5">Pour suivi en direct (optionnel)</p>
+                            </div>
+
+                            <div className="col-span-12 md:col-span-3">
+                                <label className={labelClass}>Lien Maps Point B</label>
+                                <div className="relative">
+                                    <LinkIcon className="absolute left-2 top-2.5 text-gray-400" size={14} />
+                                    <input type="url" className={`${inputClass} pl-8`} value={station.mapLinkB || ''} onChange={e => setStation({ ...station, mapLinkB: e.target.value })} placeholder="https://maps.google.com/..." />
+                                </div>
+                                <p className="text-[10px] text-gray-400 mt-0.5">Pour suivi en direct (optionnel)</p>
+                            </div>
+
                             <datalist id="cities_list">
                                 <option value="Cotonou" /><option value="Porto-Novo" /><option value="Parakou" /><option value="Abomey-Calavi" /><option value="Bohicon" /><option value="Natitingou" /><option value="Djougou" /><option value="Kandi" /><option value="Malanville" /><option value="Ouidah" /><option value="Abomey" /><option value="Lokossa" /><option value="Dassa-Zoumè" /><option value="Savalou" />
                             </datalist>
@@ -281,7 +301,7 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
                                 <label className={labelClass}>Jours de Départ</label>
                                 <div className="flex flex-wrap gap-2">
                                     {MOCK_DAYS.map(day => (
-                                        <button key={day} type="button" onClick={() => { const days = station.workDays || []; const newDays = days.includes(day) ? days.filter(d => d !== day) : [...days, day]; setStation({ ...station, workDays: newDays }); }} 
+                                        <button key={day} type="button" onClick={() => { const days = station.workDays || []; const newDays = days.includes(day) ? days.filter(d => d !== day) : [...days, day]; setStation({ ...station, workDays: newDays }); }}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${station.workDays?.includes(day) ? 'bg-[#e9b400] text-white border-[#e9b400] shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}>
                                             {day}
                                         </button>
