@@ -3,7 +3,7 @@ import {
   Truck, ShieldCheck, Users, ArrowRight, Clock, Map, Star, CheckCircle,
   Briefcase, Search, MapPin, Calendar, CreditCard, Ticket, Globe,
   AlertTriangle, TrendingUp, Server, Cloud, Smartphone, Mail, Facebook, Twitter, Linkedin, Instagram,
-  ChevronRight, Play, Zap, Award, Heart, Bus
+  ChevronRight, Play, Zap, Award, Heart, Bus, MessageCircle, Download, BarChart
 } from 'lucide-react';
 import { User, Station, ViewState } from '../../shared/types';
 import { getStations, getUsers } from '../../shared/services/storage';
@@ -99,16 +99,16 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
   const getWorkflowSteps = () => {
     if (workflowType === 'VOYAGEUR') {
       return [
-        { id: 1, icon: Search, label: "Recherche", color: "blue", pos: "top-0 left-1/2 -translate-x-1/2 -translate-y-8", title: "Trouvez votre trajet", desc: "Comparez les horaires et tarifs de toutes les compagnies." },
-        { id: 2, icon: CheckCircle, label: "Sélection", color: "green", pos: "bottom-0 right-0 translate-x-4 translate-y-4", title: "Choisissez votre place", desc: "Sélectionnez votre siège préféré sur le plan du bus." },
-        { id: 3, icon: Ticket, label: "Voyage", color: "red", pos: "bottom-0 left-0 -translate-x-4 translate-y-4", title: "Embarquez !", desc: "Recevez votre e-billet et présentez-le au départ." }
+        { id: 1, icon: Search, label: "Recherche", color: "blue", pos: "top-0 left-1/2 -translate-x-1/2 -translate-y-8", title: "Trouvez votre trajet", desc: "Comparez les horaires et tarifs de toutes les compagnies.", classes: { bg: "bg-blue-50", text: "text-blue-600", line: "bg-blue-500" } },
+        { id: 2, icon: CheckCircle, label: "Sélection", color: "green", pos: "bottom-0 right-0 translate-x-4 translate-y-4", title: "Choisissez votre place", desc: "Sélectionnez votre siège préféré sur le plan du bus.", classes: { bg: "bg-green-50", text: "text-green-600", line: "bg-green-500" } },
+        { id: 3, icon: Ticket, label: "Voyage", color: "red", pos: "bottom-0 left-0 -translate-x-4 translate-y-4", title: "Embarquez !", desc: "Recevez votre e-billet et présentez-le au départ.", classes: { bg: "bg-red-50", text: "text-red-600", line: "bg-red-500" } }
       ];
     } else {
       return [
-        { id: 1, icon: Briefcase, label: "Inscription", color: "blue", pos: "top-0 left-1/2 -translate-x-1/2 -translate-y-8", title: "Créez votre compte", desc: "Inscrivez votre compagnie en quelques clics." },
-        { id: 2, icon: ShieldCheck, label: "Validation", color: "green", pos: "right-0 top-1/2 translate-x-8 -translate-y-1/2", title: "Vérification", desc: "Nous validons vos documents officiels (ANaTT)." },
-        { id: 3, icon: Map, label: "Gestion", color: "yellow", pos: "bottom-0 left-1/2 -translate-x-1/2 translate-y-8", title: "Publiez vos trajets", desc: "Gérez vos lignes, horaires et tarifs facilement." },
-        { id: 4, icon: TrendingUp, label: "Revenus", color: "red", pos: "left-0 top-1/2 -translate-x-8 -translate-y-1/2", title: "Encaissez", desc: "Recevez vos paiements et suivez vos statistiques." }
+        { id: 1, icon: Briefcase, label: "Inscription", color: "blue", pos: "top-0 left-1/2 -translate-x-1/2 -translate-y-8", title: "Créez votre compte", desc: "Inscrivez votre compagnie en quelques clics.", classes: { bg: "bg-blue-50", text: "text-blue-600", line: "bg-blue-500" } },
+        { id: 2, icon: ShieldCheck, label: "Validation", color: "green", pos: "right-0 top-1/2 translate-x-8 -translate-y-1/2", title: "Vérification", desc: "Nous validons vos documents officiels (ANaTT).", classes: { bg: "bg-green-50", text: "text-green-600", line: "bg-green-500" } },
+        { id: 3, icon: Map, label: "Gestion", color: "yellow", pos: "bottom-0 left-1/2 -translate-x-1/2 translate-y-8", title: "Publiez vos trajets", desc: "Gérez vos lignes, horaires et tarifs facilement.", classes: { bg: "bg-yellow-50", text: "text-yellow-600", line: "bg-yellow-500" } },
+        { id: 4, icon: TrendingUp, label: "Revenus", color: "red", pos: "left-0 top-1/2 -translate-x-8 -translate-y-1/2", title: "Encaissez", desc: "Recevez vos paiements et suivez vos statistiques.", classes: { bg: "bg-red-50", text: "text-red-600", line: "bg-red-500" } }
       ];
     }
   };
@@ -235,90 +235,113 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
         </div>
       </div>
 
-      {/* 3. HOW IT WORKS - ROTARY CYCLE V2 */}
-      <section className="py-24 bg-gray-50 overflow-hidden relative">
-        {/* Decorative blobs */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#008751]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#e9b400]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+      {/* 3. NOTRE MISSION (Problème, Solution, But) */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">Notre <span className="text-[#008751]">Mission</span></h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">Moderniser le secteur du transport au Bénin pour offrir une expérience de voyage simple, sécurisée et accessible à tous.</p>
+          </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Le Problème */}
+            <div className="bg-white p-8 rounded-3xl shadow-lg border-t-4 border-[#e8112d] hover:-translate-y-2 transition-transform duration-300">
+              <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center text-[#e8112d] mb-6">
+                <AlertTriangle size={28} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Le Problème Actuel</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Les gares bondées, les files d'attente interminables, l'incertitude sur les horaires et les tarifs non réglementés rendent les voyages stressants et fatigants.
+              </p>
+            </div>
+
+            {/* La Solution */}
+            <div className="bg-white p-8 rounded-3xl shadow-lg border-t-4 border-[#008751] transform md:scale-110 md:-translate-y-4 z-10">
+              <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center text-[#008751] mb-6">
+                <CheckCircle size={28} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">La Solution VoyageBJ</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Une plateforme unique centralisant toutes les compagnies. Réservez votre billet en 2 minutes depuis votre canapé, choisissez votre siège et recevez votre E-Ticket instantanément.
+              </p>
+            </div>
+
+            {/* L'Objectif */}
+            <div className="bg-white p-8 rounded-3xl shadow-lg border-t-4 border-[#e9b400] hover:-translate-y-2 transition-transform duration-300">
+              <div className="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center text-[#e9b400] mb-6">
+                <TrendingUp size={28} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Notre Objectif</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Connecter toutes les villes du Bénin, digitaliser 100% des compagnies de transport et devenir la référence incontournable de la mobilité en Afrique de l'Ouest.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. COMMENT CA MARCHE (3D Grid Cards) */}
+      <section className="py-24 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">
               Comment ça <span className="text-[#008751] font-['Dancing_Script'] text-5xl md:text-6xl">marche ?</span>
             </h2>
 
             {/* Toggle Switch */}
-            <div className="flex justify-center mb-8">
-              <div className="bg-white p-1 rounded-full border border-gray-200 shadow-sm inline-flex">
+            <div className="flex justify-center mb-12">
+              <div className="bg-gray-100 p-1.5 rounded-full inline-flex relative">
                 <button
-                  onClick={() => { setWorkflowType('VOYAGEUR'); setActiveStep(1); }}
-                  className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${workflowType === 'VOYAGEUR' ? 'bg-[#008751] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+                  onClick={() => setWorkflowType('VOYAGEUR')}
+                  className={`relative z-10 px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 ${workflowType === 'VOYAGEUR' ? 'text-white' : 'text-gray-500 hover:text-gray-900'}`}
                 >
                   Voyageur
                 </button>
                 <button
-                  onClick={() => { setWorkflowType('COMPANY'); setActiveStep(1); }}
-                  className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${workflowType === 'COMPANY' ? 'bg-[#008751] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+                  onClick={() => setWorkflowType('COMPANY')}
+                  className={`relative z-10 px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 ${workflowType === 'COMPANY' ? 'text-white' : 'text-gray-500 hover:text-gray-900'}`}
                 >
                   Compagnie
                 </button>
+
+                {/* Rolling Background */}
+                <div className={`absolute top-1.5 bottom-1.5 rounded-full bg-[#008751] shadow-md transition-all duration-300 ease-out ${workflowType === 'VOYAGEUR' ? 'left-1.5 w-[50%] md:w-[130px]' : 'left-[50%] w-[50%] md:w-[130px]'}`}></div>
               </div>
             </div>
-
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              {workflowType === 'VOYAGEUR'
-                ? "Réservez votre prochain voyage en 3 étapes simples."
-                : "Digitalisez votre activité de transport et augmentez vos revenus."}
-            </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left: Interactive Cycle Visual */}
-            <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center">
-              {/* Central Circle */}
-              <div className="absolute w-[280px] h-[280px] md:w-[350px] md:h-[350px] border-2 border-dashed border-gray-200 rounded-full animate-spin-slow"></div>
-              <div className="absolute w-[180px] h-[180px] bg-white rounded-full shadow-2xl flex items-center justify-center z-10 p-8 text-center border-4 border-gray-50">
-                <div>
-                  <div className="text-[#008751] font-black text-5xl mb-2">0{activeStep}</div>
-                  <div className="text-gray-400 font-bold uppercase text-sm tracking-wider">Étape</div>
+          {/* 3D Cards Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-1000">
+            {steps.map((step, index) => (
+              <div
+                key={step.id}
+                className="group h-full"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="relative h-full bg-white rounded-3xl p-8 border border-gray-100 shadow-xl transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateX(5deg)_rotateY(5deg)_scale(1.02)]">
+                  {/* Decorative number background */}
+                  <div className="absolute top-0 right-0 p-6 opacity-5 font-black text-9xl text-gray-900 select-none pointer-events-none transition-transform duration-500 group-hover:translate-z-10 [transform:translateZ(0)] group-hover:[transform:translateZ(20px)]">
+                    {step.id}
+                  </div>
+
+                  {/* Icon */}
+                  <div className={`w-16 h-16 rounded-2xl ${step.classes.bg} mb-6 flex items-center justify-center ${step.classes.text} transition-transform duration-500 group-hover:[transform:translateZ(30px)]`}>
+                    <step.icon size={32} />
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative z-10 transition-transform duration-500 group-hover:[transform:translateZ(20px)]">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">{step.title}</h3>
+                    <p className="text-gray-500 leading-relaxed font-medium">
+                      {step.desc}
+                    </p>
+                  </div>
+
+                  {/* Bottom Line */}
+                  <div className={`absolute bottom-0 left-0 h-1.5 ${step.classes.line} transition-all duration-500 w-0 group-hover:w-full rounded-b-3xl`}></div>
                 </div>
               </div>
-
-              {/* Orbiting Steps */}
-              {steps.map((step) => (
-                <div
-                  key={step.id}
-                  className={`absolute ${step.pos} transition-all duration-500 transform ${activeStep === step.id ? 'scale-125 z-20' : 'scale-100 z-10 opacity-70'}`}
-                >
-                  <div
-                    className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-300 cursor-pointer ${activeStep === step.id ? 'bg-[#008751] text-white ring-4 ring-green-100' : 'bg-white text-gray-400 hover:bg-gray-50'}`}
-                    onClick={() => setActiveStep(step.id)}
-                  >
-                    <step.icon size={28} />
-                  </div>
-                  <div className={`text-center mt-3 font-bold text-sm md:text-base transition-colors duration-300 ${activeStep === step.id ? 'text-[#008751]' : 'text-gray-400'}`}>
-                    {step.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Right: Step Details */}
-            <div className="space-y-6">
-              {steps.map((step) => (
-                <div
-                  key={step.id}
-                  className={`flex gap-6 p-6 rounded-2xl transition-all duration-500 cursor-pointer ${activeStep === step.id ? 'bg-white shadow-xl border-l-4 border-[#008751] transform translate-x-2 md:translate-x-4' : 'hover:bg-white/50'}`}
-                  onClick={() => setActiveStep(step.id)}
-                >
-                  <div className={`text-2xl font-black ${activeStep === step.id ? 'text-[#008751]' : 'text-gray-300'}`}>0{step.id}</div>
-                  <div>
-                    <h3 className={`text-xl font-bold mb-2 ${activeStep === step.id ? 'text-gray-900' : 'text-gray-500'}`}>{step.title}</h3>
-                    <p className={`${activeStep === step.id ? 'text-gray-600' : 'text-gray-400 hidden lg:block'}`}>{step.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -449,32 +472,85 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
         </div>
       </section>
 
-      {/* 7. NEWSLETTER & RETENTION */}
-      <section className="py-24 bg-[#008751] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <div className="bg-white rounded-3xl p-10 md:p-16 shadow-2xl transform rotate-1">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 text-[#008751]">
-              <Mail size={40} />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
-              Ne manquez aucune <span className="text-[#008751]">offre !</span>
-            </h2>
-            <p className="text-gray-500 text-lg mb-8 max-w-lg mx-auto">
-              Inscrivez-vous à notre newsletter pour recevoir des codes promo exclusifs et être informé des nouvelles lignes.
-            </p>
+      {/* 7. FEATURES 3D GRID (Ex-Newsletter) */}
+      <section className="py-24 bg-gray-50 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">Pourquoi choisir <span className="text-[#008751]">VoyageBJ ?</span></h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">Des outils puissants pour les voyageurs et les compagnies, conçus pour simplifier votre quotidien.</p>
+          </div>
 
-            <form className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Votre adresse email"
-                className="flex-1 px-6 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#008751] outline-none font-medium"
-              />
-              <button className="bg-[#008751] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-green-200">
-                S'inscrire
-              </button>
-            </form>
-            <p className="text-xs text-gray-400 mt-4">Nous respectons votre vie privée. Désabonnement à tout moment.</p>
+          <div className="grid md:grid-cols-3 gap-8 perspective-1000">
+            {/* Card 1: Support (Green) */}
+            <div className="group h-[400px] relative transition-all duration-500 [transform-style:preserve-3d] hover:[transform:rotateY(10deg)_scale(1.02)] cursor-pointer">
+              <div className="absolute inset-0 bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col">
+                <div className="h-1/2 bg-[#008751] relative overflow-hidden flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                  <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
+                  <div className="absolute top-10 right-10 w-20 h-20 bg-yellow-400/20 rounded-full blur-xl"></div>
+
+                  <div className="relative z-10 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 transform transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                    <MessageCircle size={48} className="text-white" />
+                  </div>
+                </div>
+                <div className="h-1/2 p-8 flex flex-col justify-center relative z-10 bg-white">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-[#008751] transition-colors">Support Réactif 24/7</h3>
+                  <p className="text-gray-500 leading-relaxed text-sm">
+                    Une question ? Notre équipe est disponible à tout moment via notre auto-répondeur intelligent et notre chat en direct.
+                  </p>
+                  <div className="mt-4 flex items-center text-[#008751] font-bold text-sm opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                    En savoir plus <ArrowRight size={16} className="ml-2" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Export (Purple) */}
+            <div className="group h-[400px] relative transition-all duration-500 [transform-style:preserve-3d] hover:[transform:rotateY(10deg)_scale(1.02)] cursor-pointer" style={{ animationDelay: '100ms' }}>
+              <div className="absolute inset-0 bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col">
+                <div className="h-1/2 bg-[#8b5cf6] relative overflow-hidden flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
+
+                  <div className="relative z-10 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 transform transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3">
+                    <Download size={48} className="text-white" />
+                  </div>
+                </div>
+                <div className="h-1/2 p-8 flex flex-col justify-center relative z-10 bg-white">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-[#8b5cf6] transition-colors">Export Facile</h3>
+                  <p className="text-gray-500 leading-relaxed text-sm">
+                    Téléchargez vos historiques de voyage, vos factures et vos billets au format PDF ou Excel en un seul clic.
+                  </p>
+                  <div className="mt-4 flex items-center text-[#8b5cf6] font-bold text-sm opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                    En savoir plus <ArrowRight size={16} className="ml-2" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: Stats (Blue) */}
+            <div className="group h-[400px] relative transition-all duration-500 [transform-style:preserve-3d] hover:[transform:rotateY(10deg)_scale(1.02)] cursor-pointer" style={{ animationDelay: '200ms' }}>
+              <div className="absolute inset-0 bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col">
+                <div className="h-1/2 bg-[#3b82f6] relative overflow-hidden flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                  <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>
+
+                  <div className="relative z-10 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 transform transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                    <BarChart size={48} className="text-white" />
+                  </div>
+                </div>
+                <div className="h-1/2 p-8 flex flex-col justify-center relative z-10 bg-white">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-[#3b82f6] transition-colors">Statistiques Précises</h3>
+                  <p className="text-gray-500 leading-relaxed text-sm">
+                    Accédez à des rapports détaillés sur vos dépenses de transport ou vos revenus pour optimiser votre budget.
+                  </p>
+                  <div className="mt-4 flex items-center text-[#3b82f6] font-bold text-sm opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                    En savoir plus <ArrowRight size={16} className="ml-2" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
@@ -525,6 +601,9 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
         }
         .animate-float-delayed {
           animation: float-delayed 7s ease-in-out infinite 1s;
+        }
+        .perspective-1000 {
+          perspective: 1000px;
         }
       `}</style>
 
