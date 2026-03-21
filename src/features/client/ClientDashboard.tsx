@@ -29,6 +29,7 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
     const [allStations, setAllStations] = useState<Station[]>([]);
     const [companies, setCompanies] = useState<User[]>([]);
     const [myReservations, setMyReservations] = useState<Reservation[]>([]);
+    const [expandedStationId, setExpandedStationId] = useState<string | null>(null);
 
     const [bookingStation, setBookingStation] = useState<Station | null>(null);
     const [bookingForm, setBookingForm] = useState({ name: user.name, email: user.email, phone: user.phone || '', date: '', timeIndex: '', ticketClass: 'STANDARD' as 'STANDARD' | 'PREMIUM' });
@@ -516,77 +517,143 @@ export const ClientDashboard: React.FC<Props> = ({ user, notify, onNavigate }) =
                     </div>
                 </div>
 
-                {/* Liste des stations */}
+                {/* Stations & Trajets */}
                 <div className="max-w-4xl mx-auto">
-                    <div className="flex items-center gap-2 mb-6 px-2">
-                        <div className="w-1 h-6 bg-[#008751] rounded-full"></div>
-                        <h3 className="text-xl font-bold text-gray-900">Trajets disponibles</h3>
+                    <div className="flex items-center justify-between mb-6 px-2">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1 h-6 bg-[#008751] rounded-full"></div>
+                            <h3 className="text-xl font-bold text-gray-900">
+                                {expandedStationId ? "Trajets associés" : "Nos Stations"}
+                            </h3>
+                        </div>
+                        {expandedStationId && (
+                            <button
+                                onClick={() => setExpandedStationId(null)}
+                                className="text-sm font-bold text-[#008751] hover:underline flex items-center gap-1"
+                            >
+                                <ChevronLeft size={16} /> Retour aux stations
+                            </button>
+                        )}
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5">
-                        {companyStations.map(station => (
-                            <div key={station.id} className="bg-white rounded-3xl border border-gray-100 p-5 shadow-sm hover:shadow-lg hover:border-green-200 transition-all group flex flex-col md:flex-row gap-6">
-                                {/* Image */}
-                                <div className="w-full md:w-64 h-48 rounded-2xl overflow-hidden relative shrink-0">
-                                    <img
-                                        src={station.photoUrl || `https://source.unsplash.com/random/400x300/?bus,station`}
-                                        alt={station.name}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    />
-                                    <div className="absolute top-3 right-3">
-                                        <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider shadow-sm ${station.type === 'STATION' ? 'bg-blue-600 text-white' : 'bg-orange-500 text-white'}`}>
-                                            {station.type === 'STATION' ? 'GARE' : 'DIRECT'}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Contenu */}
-                                <div className="flex-1 flex flex-col justify-between">
-                                    <div>
-                                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
-                                            <div>
-                                                <h3 className="font-bold text-xl text-gray-900 mb-1">{station.name}</h3>
-                                                <p className="text-gray-500 text-sm flex items-center gap-1.5 font-medium">
-                                                    <MapPin size={14} /> {station.location}
-                                                </p>
+                    {!expandedStationId ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {/* Affichage des Gares (STATION) */}
+                            {companyStations.filter(s => s.type === 'STATION').map(station => {
+                                const routeCount = companyStations.filter(r => r.parentId === station.id).length;
+                                return (
+                                    <div
+                                        key={station.id}
+                                        onClick={() => setExpandedStationId(station.id)}
+                                        className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-green-200 transition-all group cursor-pointer"
+                                    >
+                                        <div className="h-48 relative overflow-hidden">
+                                            <img
+                                                src={station.photoUrl || `https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=400`}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                                alt={station.name}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                            <div className="absolute bottom-4 left-4 text-white">
+                                                <h4 className="font-bold text-lg">{station.name}</h4>
+                                                <p className="text-xs opacity-80 flex items-center gap-1"><MapPin size={12} /> {station.location}</p>
                                             </div>
-                                            <div className="bg-green-50 px-4 py-2 rounded-xl text-right border border-green-100 self-start">
-                                                <span className="block font-black text-2xl text-[#008751]">{(station.price || 0).toLocaleString()} F</span>
+                                            <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-white text-[10px] font-bold border border-white/30">
+                                                {routeCount} trajets
                                             </div>
                                         </div>
-
-                                        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 mb-4">
-                                            <div className="flex items-center gap-3 text-gray-800 font-bold text-lg mb-2">
-                                                <span className="text-[#008751]">{station.pointA}</span>
-                                                <ArrowRight size={18} className="text-gray-400" />
-                                                <span className="text-[#008751]">{station.pointB}</span>
+                                        <div className="p-4 flex justify-between items-center bg-gray-50/50">
+                                            <span className="text-sm font-bold text-gray-600">Voir les départs</span>
+                                            <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#008751] group-hover:bg-[#008751] group-hover:text-white transition-all shadow-sm">
+                                                <ArrowRight size={16} />
                                             </div>
-                                            <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{station.description || "Profitez d'un voyage confortable dans nos bus climatisés."}</p>
                                         </div>
                                     </div>
+                                );
+                            })}
 
-                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
-                                        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                                            {station.workDays.slice(0, 5).map(d => (
-                                                <span key={d} className="text-xs bg-white border border-gray-200 text-gray-600 font-bold px-2.5 py-1.5 rounded-lg">
-                                                    {d.substring(0, 3)}
+                            {/* Trajets Directs (ROUTE sans parent) */}
+                            {companyStations.filter(s => s.type === 'ROUTE' && !s.parentId).map(route => (
+                                <div key={route.id} className="bg-white rounded-3xl border border-gray-100 p-5 shadow-sm hover:shadow-lg transition-all group flex flex-col gap-4">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <div className="bg-orange-100 text-orange-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider mb-2 w-fit">Direct</div>
+                                            <h3 className="font-bold text-lg text-gray-900">{route.name}</h3>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="block font-black text-xl text-[#008751]">{(route.price || 0).toLocaleString()} F</span>
+                                        </div>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                                        <div className="flex items-center gap-2 text-gray-800 font-bold mb-1">
+                                            <span>{route.pointA}</span>
+                                            <ArrowRight size={14} className="text-gray-400" />
+                                            <span>{route.pointB}</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2 mt-2">
+                                            {route.workDays.slice(0, 3).map(d => (
+                                                <span key={d} className="text-[10px] bg-white border border-gray-200 text-gray-500 font-bold px-1.5 py-0.5 rounded">
+                                                    {d}
                                                 </span>
                                             ))}
-                                            {station.workDays.length > 5 && <span className="text-xs text-gray-400 self-center font-medium">...</span>}
                                         </div>
-                                        {station.type === 'ROUTE' && (
+                                    </div>
+                                    <button
+                                        onClick={() => { setBookingStation(route); setBookingForm({ ...bookingForm, date: '', timeIndex: '', ticketClass: 'STANDARD' }); }}
+                                        className="w-full py-3 bg-[#008751] text-white rounded-xl font-bold hover:bg-[#006b40] shadow-md transition-all flex items-center justify-center gap-2"
+                                    >
+                                        Réserver <ArrowRight size={18} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-5 animate-fade-in">
+                            {/* Affichage des trajets d'une gare spécifique */}
+                            {companyStations.filter(s => s.parentId === expandedStationId).map(route => (
+                                <div key={route.id} className="bg-white rounded-3xl border border-gray-200 p-5 shadow-sm hover:shadow-lg transition-all flex flex-col md:flex-row gap-6">
+                                    <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shrink-0">
+                                        <img src={route.photoUrl} alt={route.name} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="flex-1 flex flex-col justify-between">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h3 className="font-bold text-xl text-gray-900">{route.name}</h3>
+                                                <div className="flex items-center gap-2 text-gray-700 font-bold mt-1">
+                                                    <span>{route.pointA}</span>
+                                                    <ArrowRight size={16} className="text-gray-400" />
+                                                    <span>{route.pointB}</span>
+                                                </div>
+                                            </div>
+                                            <div className="bg-green-50 px-4 py-2 rounded-xl text-right border border-green-100">
+                                                <span className="block font-black text-2xl text-[#008751]">{(route.price || 0).toLocaleString()} F</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                            <div className="flex flex-wrap gap-2">
+                                                {route.departureHours?.slice(0, 3).map(h => (
+                                                    <span key={h} className="text-xs bg-gray-50 border border-gray-200 text-gray-600 font-bold px-2 py-1 rounded-lg">
+                                                        {h}
+                                                    </span>
+                                                ))}
+                                            </div>
                                             <button
-                                                onClick={() => { setBookingStation(station); setBookingForm({ ...bookingForm, date: '', timeIndex: '', ticketClass: 'STANDARD' }); }}
-                                                className="w-full sm:w-auto px-8 py-3 bg-[#008751] text-white rounded-xl font-bold hover:bg-[#006b40] shadow-lg shadow-green-200 hover:shadow-green-300 transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                                                onClick={() => { setBookingStation(route); setBookingForm({ ...bookingForm, date: '', timeIndex: '', ticketClass: 'STANDARD' }); }}
+                                                className="w-full sm:w-auto px-8 py-3 bg-[#008751] text-white rounded-xl font-bold hover:bg-[#006b40] shadow-lg transition-all flex items-center justify-center gap-2"
                                             >
                                                 Réserver <ArrowRight size={18} />
                                             </button>
-                                        )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                            {companyStations.filter(s => s.parentId === expandedStationId).length === 0 && (
+                                <div className="text-center py-12 bg-white rounded-3xl border-2 border-dashed border-gray-100 text-gray-400 font-medium">
+                                    Aucun trajet trouvé pour cette station.
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         );

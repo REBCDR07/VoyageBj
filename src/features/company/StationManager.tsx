@@ -80,8 +80,10 @@ export const StationManager: React.FC<Props> = ({ user, notify, onClose, editId,
             workDays: station.workDays || [],
             departureHours: station.departureHours || [],
             arrivalHours: station.arrivalHours || [],
-            price: Number(station.price) || 0,
-            pricePremium: Number(station.pricePremium) || 0
+            ...(station.type === 'ROUTE' ? {
+                price: Number(station.price) || 0,
+                pricePremium: Number(station.pricePremium) || 0
+            } : {})
         };
 
         try {

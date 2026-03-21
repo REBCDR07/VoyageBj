@@ -108,9 +108,11 @@ erDiagram
     STATION {
         string id
         string companyId
-        string type "STATION | ROUTE"
-        string location
-        number price
+        string type "STATION (Gare physique) | ROUTE (Trajet direct)"
+        string name "Nom de la gare ou du trajet"
+        string location "Ville"
+        number price "Prix (uniquement pour ROUTE)"
+        number pricePremium "Prix Premium (uniquement pour ROUTE)"
     }
 
     RESERVATION {

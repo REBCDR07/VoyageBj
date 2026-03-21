@@ -159,6 +159,12 @@ erDiagram
 
 ---
 
+### Phase 4 : Validation & KYC
+1. Implémenter le flux de validation des compagnies par l'admin.
+2. S'assurer que seules les compagnies approuvées sont visibles dans les recherches.
+
+---
+
 ## ⚠️ Points d'Attention
 
 1.  **Gestion des Images** : Ne plus stocker en Base64. Uploader vers un service (AWS S3, Cloudinary) et stocker l'URL en DB.

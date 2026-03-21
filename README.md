@@ -2,15 +2,16 @@
 
 <div align="center">
 
-![VoyageBj Banner](https://via.placeholder.com/1200x300/008751/FFFFFF?text=VoyageBj+Plateforme+Officielle)
+![VoyageBj Banner](public/banner.png)
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=for-the-badge)](https://github.com/voyagebj)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg?style=for-the-badge)](https://github.com/voyagebj)
 [![React](https://img.shields.io/badge/React-19.0.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind-4.0.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/license-Private-red.svg?style=for-the-badge)](LICENSE)
+[![Vite](https://img.shields.io/badge/Vite-6.1.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
-**La première plateforme digitale qui révolutionne le transport interurbain au Bénin.**
+**La solution complète pour la gestion et la réservation de transport au Bénin.**
+Expérience utilisateur fluide, gestion de flotte optimisée et sécurité accrue.
 Connectez-vous, réservez, voyagez.
 
 [Fonctionnalités](#-fonctionnalités) • [Architecture](#-architecture) • [Workflows](#-workflows) • [Documentation](#-documentation)
@@ -51,9 +52,9 @@ Le design system est ancré dans l'identité nationale :
 
 | Module | Fonctionnalités |
 | :--- | :--- |
-| **👤 Espace Voyageur** | • Recherche intelligente & Feed 3D interactif<br>• Sélection de siège visuelle<br>• Billets QR Code (PDF/PNG) avec design "Arrivée"<br>• Historique & Téléchargement simplifié |
-| **🏢 Espace Compagnie** | • Dashboard Analytique (Vues Stations/Trajets)<br>• Création intuitive (Upload Drag & Drop + Fallback initiaux)<br>• Validation des embarquements (Scan QR)<br>• Gestion de flotte & Horaires |
-| **🛡️ Espace Admin** | • KYC Compagnies (Vérification IFU, RCCM)<br>• Supervision du trafic & Notifications (Sonner)<br>• Gestion des utilisateurs & Rôles<br>• Audit logs |
+| **👤 Espace Voyageur** | • Recherche intelligente avec filtres avancés<br>• Affichage des gares en grille interactive<br>• Visualisation des trajets directs par gare<br>• Sélection de siège en temps réel<br>• Billets QR Code avec design premium |
+| **🏢 Espace Compagnie** | • Dashboard de gestion de flotte et stations<br>• Gestion des horaires et tarifs (Standard/Premium)<br>• Scan QR pour validation des billets<br>• Analyse des revenus et réservations |
+| **🛡️ Espace Admin** | • Validation KYC des comptes compagnies<br>• Monitoring global système<br>• Gestion des utilisateurs et rôles |
 
 ---
 

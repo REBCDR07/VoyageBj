@@ -91,68 +91,65 @@ export const SearchResultsPage: React.FC<Props> = ({ onNavigate, searchParams, u
     };
 
     const renderStationsList = () => (
-        <div className="grid gap-6">
-            <div className="flex items-center justify-between mb-2 px-1">
-                <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <Building2 className="text-[#008751]" /> {stations.length} Sous-stations trouvées
-                </h2>
+        <div className="space-y-8 animate-fade-in">
+            <div className="flex items-center justify-between mb-4 px-1">
+                <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-[#008751] rounded-full"></div>
+                    <h2 className="text-xl font-black text-gray-800 flex items-center gap-2">
+                        {stations.length} Sous-stations disponibles
+                    </h2>
+                </div>
             </div>
 
-            {stations.map(station => {
-                const stationRoutes = getRoutesForStation(station.id);
-                return (
-                    <div key={station.id} onClick={() => setViewingStationId(station.id)} className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col lg:flex-row gap-6 lg:items-center group cursor-pointer">
-                        <div className="w-full lg:w-64 h-48 lg:h-48 rounded-2xl overflow-hidden relative shrink-0 shadow-inner bg-gray-100">
-                            <img src={station.photoUrl} alt={station.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black text-[#008751] uppercase tracking-wider shadow-sm">
-                                {station.companyName}
-                            </div>
-                            <div className="absolute bottom-3 left-3 text-white">
-                                <p className="text-xs font-medium opacity-90 flex items-center gap-1"><Clock size={12} /> {station.openingTime || '--:--'} - {station.closingTime || '--:--'}</p>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 w-full flex flex-col justify-between h-full">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                                <div>
-                                    <h3 className="text-2xl font-black text-gray-900 mb-1 group-hover:text-[#008751] transition-colors">{station.name}</h3>
-                                    <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
-                                        <MapPin size={16} className="text-gray-400" /> {station.location}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {stations.map(station => {
+                    const stationRoutes = getRoutesForStation(station.id);
+                    return (
+                        <div
+                            key={station.id}
+                            onClick={() => setViewingStationId(station.id)}
+                            className="group bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full"
+                        >
+                            <div className="h-52 relative overflow-hidden">
+                                <img
+                                    src={station.photoUrl || `https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=600`}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                <div className="absolute top-4 left-4 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/30 text-white text-[10px] font-black uppercase tracking-widest">
+                                    {station.companyName}
+                                </div>
+                                <div className="absolute bottom-4 left-4 right-4">
+                                    <h3 className="text-white text-xl font-black leading-tight group-hover:text-green-300 transition-colors mb-2">{station.name}</h3>
+                                    <div className="flex items-center gap-2 text-white/80 text-xs font-bold">
+                                        <MapPin size={14} className="text-green-400" /> {station.location}
                                     </div>
-                                    {station.mapLink && (
-                                        <a href={station.mapLink} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-xs text-blue-600 hover:underline mt-1 inline-block">
-                                            Voir sur Google Maps
-                                        </a>
-                                    )}
-                                </div>
-                                <div className="text-right mt-4 md:mt-0 bg-green-50 px-4 py-2 rounded-xl border border-green-100">
-                                    <div className="text-2xl font-black text-[#008751]">{stationRoutes.length}</div>
-                                    <div className="text-[10px] font-bold text-green-700 uppercase tracking-wide">Trajets disponibles</div>
                                 </div>
                             </div>
-
-                            <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-6">
-                                <div className="flex flex-wrap gap-2 items-center mb-3">
-                                    <span className="text-xs font-bold text-gray-500 uppercase">Jours d'ouverture:</span>
-                                    {station.workDays.map(d => (
-                                        <span key={d} className="bg-white px-2 py-1 rounded text-xs font-bold text-gray-700 border border-gray-200">{d.substring(0, 3)}</span>
-                                    ))}
+                            <div className="p-6 flex flex-col flex-1 bg-gray-50/50">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-lg bg-[#008751]/10 flex items-center justify-center text-[#008751]">
+                                            <Bus size={16} />
+                                        </div>
+                                        <span className="text-sm font-bold text-gray-700">{stationRoutes.length} Trajets</span>
+                                    </div>
+                                    <div className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-[#008751] group-hover:bg-[#008751] group-hover:text-white transition-all shadow-sm">
+                                        <ArrowRight size={18} />
+                                    </div>
                                 </div>
-                                {station.description && (
-                                    <p className="text-sm text-gray-600 line-clamp-2">{station.description}</p>
-                                )}
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row gap-4 mt-auto">
-                                <button onClick={() => setViewingStationId(station.id)} className="flex-1 bg-[#008751] text-white py-4 rounded-xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-green-200 active:scale-95 flex items-center justify-center gap-2 group-hover:shadow-green-300">
-                                    Voir les trajets <ChevronRight size={18} />
-                                </button>
+                                <div className="mt-auto pt-4 border-t border-gray-100">
+                                    <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-2">Horaires :</p>
+                                    <div className="flex items-center gap-2 text-gray-700 font-bold text-sm">
+                                        <Clock size={14} className="text-[#008751]" />
+                                        {station.openingTime || '--:--'} - {station.closingTime || '--:--'}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
+            </div>
         </div>
     );
 
@@ -161,8 +158,6 @@ export const SearchResultsPage: React.FC<Props> = ({ onNavigate, searchParams, u
         if (!station) return null;
 
         const stationRoutes = getRoutesForStation(station.id);
-
-        // Also filter by search params if provided
         let filteredRoutes = stationRoutes;
         if (departure || arrival) {
             filteredRoutes = stationRoutes.filter(r => {
@@ -173,115 +168,78 @@ export const SearchResultsPage: React.FC<Props> = ({ onNavigate, searchParams, u
         }
 
         return (
-            <div className="space-y-6">
-                <div className="flex items-center gap-4 mb-6">
-                    <button onClick={() => setViewingStationId(null)} className="flex items-center gap-2 text-gray-600 hover:text-[#008751] font-bold transition-colors">
+            <div className="space-y-8 animate-fade-in">
+                <div className="flex items-center justify-between mb-8">
+                    <button onClick={() => setViewingStationId(null)} className="flex items-center gap-2 text-gray-600 hover:text-[#008751] font-bold transition-all bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm hover:shadow-md">
                         <ChevronLeft size={20} /> Retour aux stations
                     </button>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-                    <div className="flex items-start gap-4">
-                        <img src={station.photoUrl} className="w-24 h-24 rounded-xl object-cover" />
-                        <div className="flex-1">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-1">{station.name}</h2>
-                            <p className="text-gray-500 flex items-center gap-2"><MapPin size={16} /> {station.location}</p>
-                            <p className="text-sm text-gray-400 mt-2"><Clock size={14} className="inline mr-1" /> {station.openingTime || '--:--'} - {station.closingTime || '--:--'}</p>
-                        </div>
+                    <div className="hidden md:flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm font-bold text-sm">
+                        <Building2 size={16} className="text-[#008751]" />
+                        {station.name}
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between mb-4 px-1">
-                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                        <Bus className="text-[#e9b400]" /> {filteredRoutes.length} Trajets disponibles
-                    </h3>
-                </div>
-
-                {filteredRoutes.length > 0 ? (
-                    <div className="grid gap-6">
-                        {filteredRoutes.map(route => (
-                            <div key={route.id} className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col lg:flex-row gap-6 lg:items-center group">
-                                <div className="w-full lg:w-64 h-48 lg:h-48 rounded-2xl overflow-hidden relative shrink-0 shadow-inner bg-gray-100">
-                                    <img src={route.photoUrl} alt={route.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black text-[#e9b400] uppercase tracking-wider shadow-sm">
-                                        {route.companyName}
-                                    </div>
-                                    <div className="absolute bottom-3 left-3 text-white">
-                                        <p className="text-xs font-medium opacity-90 flex items-center gap-1"><Clock size={12} /> {route.departureHours?.[0] || '--:--'}</p>
+                <div className="grid grid-cols-1 gap-6">
+                    {filteredRoutes.length > 0 ? (
+                        filteredRoutes.map(route => (
+                            <div key={route.id} className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all flex flex-col md:flex-row gap-8 group">
+                                <div className="w-full md:w-56 h-40 rounded-3xl overflow-hidden shrink-0 relative">
+                                    <img src={route.photoUrl} alt={route.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-[10px] font-black text-orange-500 uppercase tracking-widest border border-orange-100 shadow-sm">
+                                        Direct
                                     </div>
                                 </div>
 
-                                <div className="flex-1 w-full flex flex-col justify-between h-full">
-                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                                <div className="flex-1 flex flex-col">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start mb-6">
                                         <div>
-                                            <h3 className="text-2xl font-black text-gray-900 mb-1 group-hover:text-[#e9b400] transition-colors">{route.name}</h3>
-                                            <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
-                                                <MapPin size={16} className="text-gray-400" /> {route.location}
+                                            <h3 className="text-2xl font-black text-gray-900 group-hover:text-[#008751] transition-colors mb-2">{route.name}</h3>
+                                            <div className="flex items-center gap-2 text-gray-500 font-bold text-sm">
+                                                <MapPin size={16} className="text-[#008751]" /> {route.location}
                                             </div>
                                         </div>
-                                        <div className="text-right mt-4 md:mt-0 bg-green-50 px-4 py-2 rounded-xl border border-green-100">
-                                            <div className="text-2xl font-black text-[#008751]">{route.price?.toLocaleString()} F</div>
-                                            <div className="text-[10px] font-bold text-green-700 uppercase tracking-wide">par personne</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-6 relative">
-                                        <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -z-10 hidden md:block"></div>
-
-                                        <div className="flex flex-col md:flex-row justify-between gap-6 relative z-10">
-                                            <div className="bg-gray-50 md:pr-4">
-                                                <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Départ</div>
-                                                <div className="font-black text-gray-900 text-lg flex items-center gap-2">
-                                                    <div className="w-3 h-3 rounded-full bg-[#008751]"></div> {route.pointA}
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center justify-center text-gray-300">
-                                                <ArrowRight size={24} className="hidden md:block" />
-                                                <div className="md:hidden h-8 w-0.5 bg-gray-200 my-2 ml-1.5"></div>
-                                            </div>
-
-                                            <div className="bg-gray-50 md:pl-4 text-left md:text-right">
-                                                <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Arrivée</div>
-                                                <div className="font-black text-gray-900 text-lg flex items-center gap-2 md:justify-end">
-                                                    <div className="w-3 h-3 rounded-full bg-yellow-400 md:order-last"></div> {route.pointB}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-4 pt-4 border-t border-gray-200 flex flex-wrap gap-2 items-center">
-                                            <Clock size={16} className="text-gray-400 mr-2" />
-                                            {route.departureHours?.slice(0, 4).map((h, i) => (
-                                                <span key={i} className="bg-white px-3 py-1 rounded-lg border border-gray-200 text-xs font-bold text-gray-700 shadow-sm">{h}</span>
-                                            ))}
-                                            {(route.departureHours?.length || 0) > 4 && <span className="text-xs font-bold text-gray-400 ml-1">+{route.departureHours!.length - 4} horaires</span>}
+                                        <div className="mt-4 sm:mt-0 text-right">
+                                            <span className="block font-black text-3xl text-[#008751]">{route.price?.toLocaleString()} F</span>
+                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">par voyageur</span>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row gap-4 mt-auto">
-                                        <button onClick={() => handleBooking(route.id)} className="flex-1 bg-[#008751] text-white py-4 rounded-xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-green-200 active:scale-95 flex items-center justify-center gap-2 group-hover:shadow-green-300">
-                                            Réserver ce trajet <ArrowRight size={18} />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                                        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-2 text-center md:text-left">Trajet & Horaires</p>
+                                            <div className="flex items-center justify-between gap-4 font-bold text-gray-800 mb-3">
+                                                <span>{route.pointA}</span>
+                                                <ArrowRight size={16} className="text-gray-300" />
+                                                <span>{route.pointB}</span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-1.5 justify-center md:justify-start">
+                                                {route.departureHours?.slice(0, 3).map(h => (
+                                                    <span key={h} className="bg-white border border-gray-100 px-2 py-1 rounded text-[10px] font-black text-[#008751] shadow-sm">{h}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleBooking(route.id)}
+                                            className="h-full bg-gray-900 text-white rounded-2xl font-black text-lg hover:bg-black transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-3"
+                                        >
+                                            Réserver <ArrowRight size={20} />
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
-                        <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
-                            <Search size={40} />
+                        ))
+                    ) : (
+                        <div className="text-center py-20 bg-white rounded-[3rem] border border-gray-100 shadow-sm">
+                            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
+                                <Search size={40} />
+                            </div>
+                            <h3 className="text-2xl font-black text-gray-900 mb-3">Aucun départ trouvé</h3>
+                            <p className="text-gray-500 max-w-sm mx-auto mb-8 text-lg">
+                                Réessayez avec d'autres critères de recherche.
+                            </p>
                         </div>
-                        <h3 className="text-2xl font-black text-gray-900 mb-3">Aucun trajet trouvé</h3>
-                        <p className="text-gray-500 max-w-md mx-auto mb-8 text-lg">
-                            Cette station n'a pas de trajet correspondant à votre recherche pour le moment.
-                        </p>
-                        <button onClick={() => setViewingStationId(null)} className="px-8 py-4 bg-[#008751] text-white rounded-2xl font-bold hover:bg-[#006b40] transition-all shadow-lg shadow-green-200">
-                            Voir d'autres stations
-                        </button>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         );
     };

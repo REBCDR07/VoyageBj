@@ -33,6 +33,11 @@ Le code est organisé par fonctionnalités dans `src/features`.
 - Si vous travaillez sur l'espace compagnie, allez dans `src/features/company`.
 - Si vous modifiez des composants globaux (Navbar, Footer), allez dans `src/shared/components`.
 
+## Gestion des Données (LocalStorage)
+L'application utilise actuellement le `localStorage` pour simuler une base de données.
+- Les données sont initialisées avec des mocks lors du premier chargement.
+- Vous pouvez réinitialiser les données en vidant le cache de votre navigateur ou via la console : `localStorage.clear(); window.location.reload();`.
+
 ## Bonnes Pratiques
 - Utilisez des chemins relatifs pour les imports internes à une feature.
 - Utilisez les composants partagés de `src/shared/components` pour garder une UI cohérente.

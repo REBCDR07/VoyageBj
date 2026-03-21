@@ -277,7 +277,7 @@ export const CompanyDashboard: React.FC<Props> = ({ user, notify, onNavigate, se
                         <span>{station.openingTime || '--:--'} - {station.closingTime || '--:--'}</span>
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {station.workDays.map(d => <span key={d} className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-500">{d.substring(0, 3)}</span>)}
+                        {station.workDays?.map(d => <span key={d} className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-500">{d.substring(0, 3)}</span>)}
                       </div>
                     </div>
 

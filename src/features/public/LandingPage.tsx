@@ -386,41 +386,45 @@ export const LandingPage: React.FC<Props> = ({ onNavigate, user }) => {
             </button>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-10">
             {popularRoutes.length > 0 ? popularRoutes.map((station) => {
               const allStations = getStations();
               const routeCount = allStations.filter(s => s.parentId === station.id).length;
 
               return (
-                <div key={station.id} onClick={() => onNavigate('SEARCH_RESULTS', { departure: station.location, arrival: '', date: '' })} className="group relative h-[400px] rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500">
-                  <img src={station.photoUrl || `https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800`} alt={station.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                <div
+                  key={station.id}
+                  onClick={() => onNavigate('SEARCH_RESULTS', { departure: station.location, arrival: '', date: '' })}
+                  className="group relative h-[450px] rounded-[3rem] overflow-hidden cursor-pointer shadow-xl hover:shadow-[0_20px_60px_rgba(0,107,64,0.15)] transition-all duration-700 hover:-translate-y-2 border border-white"
+                >
+                  <img src={station.photoUrl || `https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800`} alt={station.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
 
-                  <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs font-bold border border-white/30">
+                  <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl text-white text-[10px] font-black border border-white/30 uppercase tracking-widest">
                     {station.companyName}
                   </div>
 
-                  <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <div className="flex items-center gap-2 text-[#e9b400] mb-2 font-bold">
+                  <div className="absolute bottom-0 left-0 right-0 p-10 transform translate-y-6 group-hover:translate-y-0 transition-transform duration-700">
+                    <div className="flex items-center gap-2 text-[#FCD116] mb-3 font-black text-xs uppercase tracking-widest">
                       <MapPin size={16} />
                       <span>{station.location}</span>
                     </div>
-                    <h3 className="text-3xl font-black text-white mb-4">{station.name}</h3>
+                    <h3 className="text-4xl font-black text-white mb-6 group-hover:text-green-300 transition-colors uppercase leading-tight">{station.name}</h3>
 
-                    <div className="flex items-center justify-between border-t border-white/20 pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                    <div className="flex items-center justify-between border-t border-white/20 pt-6 opacity-0 group-hover:opacity-100 transition-all duration-700 delay-100 transform translate-y-4 group-hover:translate-y-0">
                       <div className="text-white">
-                        <span className="block text-2xl font-bold">{routeCount}</span>
-                        <span className="text-xs text-gray-300 uppercase">Départs / Jour</span>
+                        <span className="block text-3xl font-black text-green-400">{routeCount}</span>
+                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Lignes Directes</span>
                       </div>
-                      <div className="w-10 h-10 bg-[#008751] rounded-full flex items-center justify-center text-white">
-                        <ArrowRight size={20} />
+                      <div className="w-14 h-14 bg-[#008751] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-green-900/50 group-hover:bg-[#006b40] transition-all">
+                        <ArrowRight size={24} />
                       </div>
                     </div>
                   </div>
                 </div>
               );
             }) : (
-              <div className="col-span-3 text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+              <div className="col-span-3 text-center py-20 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-100">
                 <p className="text-gray-400 font-medium">Chargement des destinations...</p>
               </div>
             )}

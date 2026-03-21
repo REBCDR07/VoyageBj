@@ -108,7 +108,7 @@ export const CompanyDetailsModal: React.FC<Props> = ({ isOpen, onClose, company 
                                     <div key={station.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200 flex flex-col gap-2">
                                         <div className="flex justify-between items-start">
                                             <h4 className="font-bold text-gray-800">{station.name}</h4>
-                                            <span className="text-[#008751] font-bold text-sm">{station.price} F</span>
+                                            {station.type === 'ROUTE' && <span className="text-[#008751] font-bold text-sm">{station.price} F</span>}
                                         </div>
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
                                             <span className="font-medium">{station.pointA}</span>
